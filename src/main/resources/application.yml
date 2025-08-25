@@ -15,3 +15,5 @@ spring:
   application:
     name: Youtube Tunnel Application
 
+config:
+  key: ${YOUTUBE_API_KEY:key}
