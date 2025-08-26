@@ -38,8 +38,6 @@ public class YoutubeStreamServiceImpl implements YoutubeStreamService {
 		cmd.addArgument("-g");
 		cmd.addArgument(youtubeUrl, false);
 
-		log.info("#YoutubeStreamService.getAudioStreamUrl: command to run is {}", cmd);
-
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DefaultExecutor executor = new DefaultExecutor();
 		executor.setStreamHandler(new PumpStreamHandler(outputStream));
