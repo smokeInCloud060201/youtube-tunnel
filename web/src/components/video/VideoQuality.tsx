@@ -13,9 +13,31 @@ interface Props {
   onChangeQuality: (quality: string) => void;
 }
 
+interface SelectContentCustomProps {
+  options?: string[];
+  value: string;
+}
+
+const QUALITY_OPTIONS = ["144p", "240p", "360p", "480p", "720p", "1080p", "Best"];
+
+const SelectContentCustom = ({ options, value }: SelectContentCustomProps) => {
+  if (!options) return <div></div>;
+  return (
+    <SelectContent side="top">
+      {options.map((option) => {
+        const classNames = option === value ? "bg-search-gray-300" : "";
+        return (
+          <SelectItem key={option} value={option} className={classNames}>
+            {option}
+          </SelectItem>
+        );
+      })}
+    </SelectContent>
+  );
+};
+
 const VideoQuality = ({ value, videoRef, onChangeQuality }: Props) => {
-  console.log(value);
-  const handleQualityChange = (newQuality: string) => {
+  const handleQualityChange = async (newQuality: string) => {
     if (!videoRef?.current) return;
 
     const video = videoRef.current;
@@ -28,10 +50,10 @@ const VideoQuality = ({ value, videoRef, onChangeQuality }: Props) => {
       "https://www.youtube.com/watch?v=n7DBCe4QpIE"
     )}&enableVideo=true&quality=${newQuality}`;
 
-    video.onloadedmetadata = () => {
+    video.onloadedmetadata = async () => {
       video.currentTime = currentTime;
       if (isPlaying) {
-        video.play();
+        await video.play();
       }
       video.onloadedmetadata = null;
     };
@@ -44,15 +66,7 @@ const VideoQuality = ({ value, videoRef, onChangeQuality }: Props) => {
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Quality" />
       </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="144p">144p</SelectItem>
-        <SelectItem value="240p">240p</SelectItem>
-        <SelectItem value="360p">360p</SelectItem>
-        <SelectItem value="480p">480p</SelectItem>
-        <SelectItem value="720p">720p</SelectItem>
-        <SelectItem value="1080p">1080p</SelectItem>
-        <SelectItem value="best">Best</SelectItem>
-      </SelectContent>
+      <SelectContentCustom options={QUALITY_OPTIONS} value={value} />
     </Select>
   );
 };
