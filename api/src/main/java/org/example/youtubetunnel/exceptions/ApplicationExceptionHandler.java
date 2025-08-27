@@ -12,13 +12,13 @@ public class ApplicationExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleException(Exception e) {
-        log.error(e.getMessage(), e);
+		log.error(e.getMessage(), e);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 	}
 
 	@ExceptionHandler(ApplicationException.class)
 	public ResponseEntity<String> handleApplicationException(ApplicationException e) {
-        log.error(e.getMessage(), e);
+		log.error(e.getMessage(), e);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 	}
 
