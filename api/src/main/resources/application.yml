@@ -17,3 +17,6 @@ spring:
 
 config:
   key: ${YOUTUBE_API_KEY:key}
+cors:
+  cors-list:
+    - http://localhost:5173

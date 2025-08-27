@@ -1,5 +1,11 @@
+import { Video } from "@/components";
+
 const Home = () => {
-  return <div>This is home page</div>;
+  return (
+    <div>
+      <Video />
+    </div>
+  );
 };
 
 export default Home;
