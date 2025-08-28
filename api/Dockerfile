@@ -8,7 +8,7 @@ WORKDIR /build
 RUN apt-get update && apt-get install -y dos2unix && rm -rf /var/lib/apt/lists/*
 
 COPY --chmod=0755 gradlew gradlew
-RUN dos2unix ./gradlew
+RUN chmod +x gradlew && dos2unix ./gradlew
 
 # Copy Gradle wrapper and config first (to leverage cache)
 COPY gradle gradle
