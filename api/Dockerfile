@@ -22,6 +22,8 @@ RUN --mount=type=cache,target=/home/gradle/.gradle \
 # Copy source code
 COPY . .
 
+RUN chmod +x gradlew
+
 # Build the fat jar (skip tests for speed)
 RUN --mount=type=cache,target=/home/gradle/.gradle \
     ./gradlew --no-daemon bootJar -x test
