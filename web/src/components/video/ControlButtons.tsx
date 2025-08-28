@@ -49,10 +49,10 @@ const ControlButtons = ({
 }: Props) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!videoRef.current) return;
     if (videoRef.current.paused) {
-      videoRef.current.play();
+      await videoRef.current.play();
       setIsPlaying(true);
     } else {
       videoRef.current.pause();
@@ -63,7 +63,9 @@ const ControlButtons = ({
   const toggleMute = () => {
     if (!videoRef.current) return;
     videoRef.current.muted = !videoRef.current.muted;
-    setIsMuted(videoRef.current.muted);
+    setIsMuted(!videoRef.current.muted);
+
+    console.log("videoRefMuted ", videoRef.current.muted);
   };
 
   const toggleFullscreen = () => {

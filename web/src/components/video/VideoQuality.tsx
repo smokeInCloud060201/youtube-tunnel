@@ -46,8 +46,8 @@ const VideoQuality = ({ value, videoRef, onChangeQuality }: Props) => {
 
     onChangeQuality(newQuality);
 
-    video.src = `/api/stream?url=${encodeURIComponent(
-      "https://www.youtube.com/watch?v=n7DBCe4QpIE"
+    video.src = `http://yt.sonbn.xyz/api/stream?url=${encodeURIComponent(
+      "n7DBCe4QpIE"
     )}&enableVideo=true&quality=${newQuality}`;
 
     video.onloadedmetadata = async () => {

@@ -15,7 +15,7 @@ const VideoControl = ({ videoRef, quality, setQuality }: Props) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (videoRef.current && videoRef.current.duration) {
+      if (videoRef?.current?.duration) {
         setProgress((videoRef.current.currentTime / videoRef.current.duration) * 100);
       }
     }, 500);
