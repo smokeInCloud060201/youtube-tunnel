@@ -29,10 +29,21 @@ steps:
       - docker pull tnkhanh/youtube-tunnel:latest
       - docker compose -f ./api/docker-compose.yml down --remove-orphans
       - docker compose -f ./api/docker-compose.yml up -d --build
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
 
   - name: cleanup
     image: docker:24.0.7-cli
     commands:
       - docker compose -f ./api/docker-compose.yml down
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
     when:
       status: [ failure ]
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock

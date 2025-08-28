@@ -1,0 +1,7 @@
+./web/node_modules
+./web/node_modules/*
+./api/build
+./api/build/*
+./api/.gradle
+./api/.gradle/*
+./api/src/resources/static/*
