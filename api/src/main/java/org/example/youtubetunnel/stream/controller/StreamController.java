@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.youtubetunnel.stream.dtos.VideoQuality;
+import org.example.youtubetunnel.stream.dtos.VideoQuality;
 import org.example.youtubetunnel.stream.services.ProxyStreamService;
 import org.example.youtubetunnel.stream.services.YoutubeStreamService;
 import org.springframework.http.MediaType;
@@ -28,6 +29,8 @@ public class StreamController {
 			@RequestParam("url") String youtubeUrl,
 			@RequestParam(name = "quality", defaultValue = "1080p") VideoQuality quality, HttpServletRequest request,
 			HttpServletResponse response) {
+
+		youtubeUrl = "https://youtube.com/watch?v=" + youtubeUrl;
 		try {
 			log.info("#StreamController.streamAudio(enableVideo={}, url={})", enableVideo, youtubeUrl);
 			String audioUrl = youtubeStreamService.getAudioStreamUrl(youtubeUrl, enableVideo, quality);

@@ -17,15 +17,15 @@ public class YoutubeStreamServiceImpl implements YoutubeStreamService {
 
 	public String getAudioStreamUrl(String youtubeUrl, boolean showVideo, VideoQuality quality) throws Exception {
 
-//		CommandLine cmd = new CommandLine("python");
-//		cmd.addArgument("-m");
-//		cmd.addArgument("yt_dlp");
-//		cmd.addArgument("--no-playlist");
-//		cmd.addArgument("-f");
-
-		CommandLine cmd = new CommandLine("yt-dlp");
+		CommandLine cmd = new CommandLine("python");
+		cmd.addArgument("-m");
+		cmd.addArgument("yt_dlp");
 		cmd.addArgument("--no-playlist");
 		cmd.addArgument("-f");
+
+		// CommandLine cmd = new CommandLine("yt-dlp");
+		// cmd.addArgument("--no-playlist");
+		// cmd.addArgument("-f");
 
 		if (showVideo) {
 			if (VideoQuality.P_BEST.equals(quality)) {

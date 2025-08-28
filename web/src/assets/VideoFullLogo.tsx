@@ -1,8 +1,8 @@
 import type { IconProps } from "@/types";
 import CustomIcon from "@/components/icon/CustomIcon.tsx";
-import IconSVG from "@/assets/svg/video-sound.svg?react";
+import IconSVG from "@/assets/svg/video-full-screen.svg?react";
 
-const VideoSoundLogo = ({ className }: IconProps) => {
+const VideoFullLogo = ({ className }: IconProps) => {
   const darkTheme = { color: "white", width: 24, height: 24 };
   const lightTheme = { color: "white", width: 24, height: 24 };
 
@@ -16,4 +16,4 @@ const VideoSoundLogo = ({ className }: IconProps) => {
   );
 };
 
-export default VideoSoundLogo;
+export default VideoFullLogo;
