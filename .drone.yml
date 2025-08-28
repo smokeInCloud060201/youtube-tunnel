@@ -9,6 +9,13 @@ trigger:
     - push
 
 steps:
+  - name: build FE
+    image: node:22-alpine
+    commands:
+      - cd web
+      - yarn install
+      - yarn build
+
   - name: build and push docker image test
     image: plugins/docker
     environment:
