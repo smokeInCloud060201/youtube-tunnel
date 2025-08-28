@@ -9,7 +9,7 @@ trigger:
     - push
 
 steps:
-  - name: build and push docker image
+  - name: build and push docker image test
     image: plugins/docker
     settings:
       repo: tnkhanh/youtube-tunnel
