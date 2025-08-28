@@ -1,0 +1,37 @@
+kind: pipeline
+type: docker
+name: build-and-deploy
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
+
+steps:
+  - name: build and push docker image
+    image: plugins/docker
+    settings:
+      repo: tnkhanh/youtube-tunnel
+      tags: latest
+      username:
+        from_secret: DOCKER_USERNAME
+      password:
+        from_secret: DOCKER_PASSWORD
+      context: api
+      dockerfile: api/Dockerfile
+
+
+  - name: deploy app
+    image: docker:24.0.7-cli
+    commands:
+      - docker pull tnkhanh/youtube-tunnel:latest
+      - docker compose -f ./api/docker-compose.yml down --remove-orphans
+      - docker compose -f ./api/docker-compose.yml up -d --build
+
+  - name: cleanup
+    image: docker:24.0.7-cli
+    commands:
+      - docker compose -f ./api/docker-compose.yml down
+    when:
+      status: [ failure ]
