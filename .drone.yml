@@ -4,7 +4,7 @@ name: build-and-deploy
 
 trigger:
   branch:
-    - main
+    - master
   event:
     - push
 
