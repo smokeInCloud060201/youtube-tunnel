@@ -11,6 +11,8 @@ trigger:
 steps:
   - name: build and push docker image test
     image: plugins/docker
+    environment:
+      DOCKER_BUILDKIT: 1
     settings:
       repo: tnkhanh/youtube-tunnel
       tags: latest
@@ -20,7 +22,6 @@ steps:
         from_secret: DOCKER_PASSWORD
       context: api
       dockerfile: api/Dockerfile
-      buildkit: true
 
   - name: deploy app
     image: docker:24.0.7-cli
