@@ -46,7 +46,7 @@ const VideoQuality = ({ value, videoRef, onChangeQuality }: Props) => {
 
     onChangeQuality(newQuality);
 
-    video.src = `http://localhost:8080/api/stream?url=${encodeURIComponent(
+    video.src = `/api/stream?url=${encodeURIComponent(
       "https://www.youtube.com/watch?v=n7DBCe4QpIE"
     )}&enableVideo=true&quality=${newQuality}`;
 
