@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/public/stream/v1/")
+@RequestMapping("/api/public/stream/v1")
 public class StreamController {
 
 	private final YoutubeStreamService youtubeStreamService;
