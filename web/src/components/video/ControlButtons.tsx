@@ -17,7 +17,7 @@ interface Props {
   isMuted: boolean;
   setIsMuted: (muted: boolean) => void;
   quality: string;
-  setQuality: (quality: string) => void;
+  handleQualityChange: (quality: string) => void;
 }
 
 interface ToggleButtonProps {
@@ -45,7 +45,7 @@ const ControlButtons = ({
   isMuted,
   setIsMuted,
   quality,
-  setQuality,
+  handleQualityChange,
 }: Props) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -107,7 +107,7 @@ const ControlButtons = ({
         </span>
       </div>
       <div className="flex items-center justify-center">
-        <QualitySettings videoRef={videoRef} quality={quality} setQuality={setQuality} />
+        <QualitySettings quality={quality} handleQualityChange={handleQualityChange} />
         <ToggleButton
           active={isFullscreen}
           onClick={toggleFullscreen}

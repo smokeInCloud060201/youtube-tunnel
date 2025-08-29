@@ -1,4 +1,3 @@
-import type { RefObject } from "react";
 import {
   Select,
   SelectContent,
@@ -9,7 +8,6 @@ import {
 
 interface Props {
   value: string;
-  videoRef: RefObject<HTMLVideoElement | null>;
   onChangeQuality: (quality: string) => void;
 }
 
@@ -36,33 +34,9 @@ const SelectContentCustom = ({ options, value }: SelectContentCustomProps) => {
   );
 };
 
-const VideoQuality = ({ value, videoRef, onChangeQuality }: Props) => {
-  const handleQualityChange = async (newQuality: string) => {
-    if (!videoRef?.current) return;
-
-    const video = videoRef.current;
-    const currentTime = video.currentTime;
-    const isPlaying = !video.paused;
-
-    onChangeQuality(newQuality);
-
-    video.src = `http://yt.sonbn.xyz/api/stream?url=${encodeURIComponent(
-      "n7DBCe4QpIE"
-    )}&enableVideo=true&quality=${newQuality}`;
-
-    video.onloadedmetadata = async () => {
-      video.currentTime = currentTime;
-      if (isPlaying) {
-        await video.play();
-      }
-      video.onloadedmetadata = null;
-    };
-
-    video.load();
-  };
-
+const VideoQuality = ({ value, onChangeQuality }: Props) => {
   return (
-    <Select onValueChange={handleQualityChange}>
+    <Select onValueChange={onChangeQuality}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Quality" />
       </SelectTrigger>

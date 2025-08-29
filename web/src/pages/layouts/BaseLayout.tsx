@@ -1,4 +1,5 @@
 import { Navigation } from "@/components";
+import * as React from "react";
 
 interface Props {
   children?: React.ReactNode;

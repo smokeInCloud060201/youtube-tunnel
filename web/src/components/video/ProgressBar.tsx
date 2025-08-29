@@ -13,13 +13,13 @@ const ProgressBar = ({ videoRef, progress, setProgress }: Props) => {
   const [hoverTime, setHoverTime] = React.useState<number | null>(null);
 
   const handleSeek = (value: number) => {
-    if (!videoRef.current || !videoRef.current.duration) return;
+    if (!videoRef?.current?.duration) return;
     videoRef.current.currentTime = (value / 100) * videoRef.current.duration;
     setProgress(value);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLInputElement>) => {
-    if (!videoRef.current || !videoRef.current.duration) return;
+    if (!videoRef?.current?.duration) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     setHoverTime(percent * videoRef.current.duration);
@@ -39,7 +39,7 @@ const ProgressBar = ({ videoRef, progress, setProgress }: Props) => {
         onChange={(e) => handleSeek(Number(e.target.value))}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="w-full mb-1"
+        className="w-full mb-1 px-0"
       />
       {hoverTime !== null && (
         <div

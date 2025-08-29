@@ -5,10 +5,10 @@ import ControlButtons from "./ControlButtons";
 interface Props {
   videoRef: RefObject<HTMLVideoElement | null>;
   quality: string;
-  setQuality: (q: string) => void;
+  handleQualityChange: (q: string) => void;
 }
 
-const VideoControl = ({ videoRef, quality, setQuality }: Props) => {
+const VideoControl = ({ videoRef, quality, handleQualityChange }: Props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -32,7 +32,7 @@ const VideoControl = ({ videoRef, quality, setQuality }: Props) => {
         isMuted={isMuted}
         setIsMuted={setIsMuted}
         quality={quality}
-        setQuality={setQuality}
+        handleQualityChange={handleQualityChange}
       />
     </div>
   );
