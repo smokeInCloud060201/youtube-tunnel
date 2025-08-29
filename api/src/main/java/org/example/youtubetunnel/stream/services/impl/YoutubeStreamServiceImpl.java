@@ -1,5 +1,6 @@
 package org.example.youtubetunnel.stream.services.impl;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -10,6 +11,9 @@ import org.example.youtubetunnel.stream.services.YoutubeStreamService;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 @Service
 @Slf4j
@@ -56,5 +60,36 @@ public class YoutubeStreamServiceImpl implements YoutubeStreamService {
 
 		return outputStream.toString().trim().split("\\R")[0];
 	}
+
+    @Override
+    public void streamHls(String youtubeUrl, String quality, HttpServletResponse response) throws ApplicationException, IOException {
+        String format = String.format("bestvideo[height<=%s]+bestaudio/best", quality.replace("p", ""));
+
+        // Build command
+        String[] cmd = {
+                "bash", "-c",
+                String.format("yt-dlp -f \"%s\" -o - \"%s\" | " +
+                        "ffmpeg -i pipe:0 -c:v copy -c:a copy -f hls -hls_time 6 -hls_list_size 0 -", format, youtubeUrl)
+        };
+
+        ProcessBuilder pb = new ProcessBuilder(cmd);
+        Process process = pb.start();
+
+        // Send headers
+        response.setContentType("application/vnd.apple.mpegurl");
+
+        try (InputStream in = process.getInputStream();
+             OutputStream out = response.getOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+                out.flush();
+            }
+        } catch (Exception e) {
+            log.error("Error while streaming HLS", e);
+            throw new ApplicationException("Error while streaming HLS");
+        }
+    }
 
 }
