@@ -15,14 +15,13 @@ import java.util.List;
 @RequestMapping("/api/private/search/v1")
 public class YoutubeController {
 
-    private final SearchService searchService;
+	private final SearchService searchService;
 
 	@GetMapping
 	public List<VideoDTO> getVideo(@RequestParam(name = "part", defaultValue = "snippet") String part,
-                                   @RequestParam(name = "type", defaultValue = "video") String type,
-                                   @RequestParam(name = "q") String query,
-                                   @RequestParam(name = "maxResults") int maxResults) {
-		return searchService. searchVideo(part, type, query, maxResults);
+			@RequestParam(name = "type", defaultValue = "video") String type, @RequestParam(name = "q") String query,
+			@RequestParam(name = "maxResults", defaultValue = "50") int maxResults) {
+		return searchService.searchVideo(part, type, query, maxResults);
 	}
 
 }

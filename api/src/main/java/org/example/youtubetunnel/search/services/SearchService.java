@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface SearchService {
 
-    List<VideoDTO> searchVideo(String part, String type, String query, int maxResults);
+	List<VideoDTO> searchVideo(String part, String type, String query, int maxResults);
 
 }
