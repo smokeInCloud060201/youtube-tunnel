@@ -1,2 +1,2 @@
 export * from "./api.base";
-export * as StreamProxyAPI from "./stream_proxy_service";
+export * as SearchAPI from "./search_service.ts";

@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.http.client.HttpClient;
 
-import javax.net.ssl.SSLException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 

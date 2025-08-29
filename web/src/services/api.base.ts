@@ -1,5 +1,7 @@
 import axios from "axios";
 
-const api = axios.create({ baseURL: "http://localhost:8080" });
+const baseApi = axios.create({
+  baseURL: "http://yt.sonbn.xyz",
+});
 
-export { api };
+export { baseApi };

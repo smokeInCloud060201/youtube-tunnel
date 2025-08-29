@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@/components";
 import { Auth0Provider } from "@auth0/auth0-react";
+import { ApiProvider } from "@/ApiContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -22,7 +23,9 @@ createRoot(document.getElementById("root")!).render(
     >
       <BrowserRouter>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <App />
+          <ApiProvider>
+            <App />
+          </ApiProvider>
         </ThemeProvider>
       </BrowserRouter>
     </Auth0Provider>

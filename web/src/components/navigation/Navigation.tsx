@@ -3,21 +3,21 @@ import YoutubeLogo from "@/assets/YoutubeLogo.tsx";
 import NavMenu from "@/assets/NavMenu.tsx";
 import Search from "@/components/navigation/Search.tsx";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar.tsx";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
   const [searchText, setSearchText] = useState("");
 
-  const { loginWithRedirect, getAccessTokenSilently } = useAuth0();
-  const getToken = useCallback(async () => {
-    const token = await getAccessTokenSilently();
-    console.log("Token ", token);
-  }, [getAccessTokenSilently]);
+  const { loginWithRedirect } = useAuth0();
 
-  useEffect(() => {
-    getToken();
-  }, []);
+  const navigate = useNavigate();
+
+  const goToSearch = () => {
+    console.log("goToSearch ", searchText);
+    navigate(`/search?query=${encodeURIComponent(searchText)}`, { replace: true });
+  };
 
   return (
     <nav className="app-nav flex">
@@ -30,9 +30,7 @@ const Navigation = () => {
           <Search
             value={searchText}
             updateValue={(e) => setSearchText(e?.target?.value)}
-            handleSearch={() => {
-              console.log("Search text", searchText);
-            }}
+            handleSearch={goToSearch}
           />
         </div>
         <div className="flex items-center justify-center gap-6">
