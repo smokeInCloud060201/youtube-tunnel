@@ -29,12 +29,12 @@ public class YoutubeStreamServiceImpl implements YoutubeStreamService {
 
 		if (showVideo) {
 			if (VideoQuality.P_BEST.equals(quality)) {
-                cmd.addArgument("best");
+				cmd.addArgument("best");
 			}
 			else {
 				// Limit video height to requested quality
-                String height = quality.getCode().replace("p", "");
-                cmd.addArgument(String.format("best[height<=%s]", height));
+				String height = quality.getCode().replace("p", "");
+				cmd.addArgument(String.format("best[height<=%s]", height));
 			}
 		}
 		else {

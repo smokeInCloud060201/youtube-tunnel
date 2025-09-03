@@ -10,7 +10,8 @@ const VideoSearch = () => {
 
   const [searchResult, setSearchResult] = useState([]);
 
-  const handleSearch = useCallback(async () => {
+  const handleSearch = useCallback(async (queryText) => {
+    console.log("Quert Text ", queryText)
     if (queryText) {
       const { data } = await baseApi.get("/api/private/search/v1", {
         headers: { Authorization: `Bearer ${queryText}` },
@@ -18,11 +19,11 @@ const VideoSearch = () => {
       });
       setSearchResult(data);
     }
-  }, [queryText]);
+  }, []);
 
   useEffect(() => {
-    handleSearch();
-  }, []);
+    handleSearch(queryText);
+  }, [queryText]);
 
   return (
     <div>

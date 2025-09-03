@@ -14,8 +14,7 @@ createRoot(document.getElementById("root")!).render(
       clientId="2GU26qrp4MaAsqyXDKxhbt6HUTzJlaSZ"
       authorizationParams={{
         redirect_uri: `${window.location.origin}/callback`,
-        audience: "http://localhost:8080",
-        prompt: "consent",
+        audience: `http://localhost:8080`,
         scope: "openid profile email offline_access",
       }}
       cacheLocation="localstorage"

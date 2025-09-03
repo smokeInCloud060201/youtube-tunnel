@@ -16,7 +16,7 @@ const Navigation = () => {
 
   const goToSearch = () => {
     console.log("goToSearch ", searchText);
-    navigate(`/search?query=${encodeURIComponent(searchText)}`, { replace: true });
+    navigate(`/search?query=${encodeURIComponent(searchText)}`, { replace: false });
     setSearchText("");
   };
 
