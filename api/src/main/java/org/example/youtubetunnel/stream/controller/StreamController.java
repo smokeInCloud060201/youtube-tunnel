@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.youtubetunnel.stream.dtos.VideoQuality;
+import org.example.youtubetunnel.stream.dtos.VideoQuality;
 import org.example.youtubetunnel.stream.services.ProxyStreamService;
 import org.example.youtubetunnel.stream.services.YoutubeStreamService;
 import org.springframework.http.MediaType;
@@ -39,20 +40,5 @@ public class StreamController {
 			response.setStatus(500);
 		}
 	}
-
-    @GetMapping("/hls")
-    public void getHlsStream(@RequestParam("url") String youtubeId,
-                             @RequestParam(name = "quality", defaultValue = "1080p") String quality,
-                             HttpServletResponse response) {
-        String youtubeUrl = "https://youtube.com/watch?v=" + youtubeId;
-        log.info("#HlsStreamController.getHlsStream url={} quality={}", youtubeUrl, quality);
-
-        try {
-            youtubeStreamService.streamHls(youtubeUrl, quality, response);
-        } catch (Exception e) {
-            response.setStatus(500);
-            log.error("HLS streaming failed", e);
-        }
-    }
 
 }

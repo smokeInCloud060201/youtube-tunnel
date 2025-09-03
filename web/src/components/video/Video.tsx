@@ -1,12 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import VideoControl from "@/components/video/VideoControl.tsx";
-import Hls from "hls.js";
 
 interface Props {
   id: string;
 }
-
-const ENABLE_HLS = true;
 
 const Video = ({ id }: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -34,30 +31,14 @@ const Video = ({ id }: Props) => {
     video.load();
   };
 
-  useEffect(() => {
-    if (!videoRef.current) return;
-
-    const hls = new Hls();
-    hls.loadSource(`http://yt.sonbn.xyz/api/public/stream/v1/hls?url=${id}&quality=${quality}`);
-    hls.attachMedia(videoRef.current);
-
-    return () => {
-      hls.destroy();
-    };
-  }, [id, quality]);
-
   return (
     <div className="app-video relative w-[640px] h-[360px]">
-      {ENABLE_HLS ? (
-        <video ref={videoRef} className="w-full h-full bg-black" controls muted />
-      ) : (
-        <video ref={videoRef} className="w-full h-full bg-black" muted>
-          <source
-            src={`http://yt.sonbn.xyz/api/public/stream/v1?url=${id}&enableVideo=true&quality=${quality}`}
-            type="video/mp4"
-          />
-        </video>
-      )}
+      <video ref={videoRef} className="w-full h-full bg-black" muted>
+        <source
+          src={`http://yt.sonbn.xyz/api/public/stream/v1?url=${id}&enableVideo=true&quality=${quality}`}
+          type="video/mp4"
+        />
+      </video>
 
       {/* Custom Video Controls */}
       <VideoControl
