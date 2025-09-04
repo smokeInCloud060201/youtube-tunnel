@@ -10,8 +10,7 @@ const VideoSearch = () => {
 
   const [searchResult, setSearchResult] = useState([]);
 
-  const handleSearch = useCallback(async (queryText) => {
-    console.log("Quert Text ", queryText)
+  const handleSearch = useCallback(async (queryText: string | null) => {
     if (queryText) {
       const { data } = await baseApi.get("/api/private/search/v1", {
         headers: { Authorization: `Bearer ${queryText}` },
