@@ -4,13 +4,10 @@ import NavMenu from "@/assets/NavMenu.tsx";
 import Search from "@/components/navigation/Search.tsx";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar.tsx";
 import { useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
   const [searchText, setSearchText] = useState("");
-
-  const { loginWithRedirect } = useAuth0();
 
   const navigate = useNavigate();
 
@@ -35,12 +32,7 @@ const Navigation = () => {
           />
         </div>
         <div className="flex items-center justify-center gap-6">
-          <Avatar
-            className="cursor-pointer"
-            onClick={() => {
-              loginWithRedirect();
-            }}
-          >
+          <Avatar className="cursor-pointer">
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
           <ModeToggle />
