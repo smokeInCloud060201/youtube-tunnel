@@ -37,8 +37,9 @@ public class SearchServiceImpl implements SearchService {
 		queryParams.put("maxResults", String.valueOf(maxResults));
 		queryParams.put("key", configProperties.key());
 
-		 SearchVideoResponseDTO searchVideoResponseDTO = webClientUtil.get(VIDEO_URL,
-		 queryParams, Collections.emptyMap(), SearchVideoResponseDTO.class).join();
+		SearchVideoResponseDTO searchVideoResponseDTO = webClientUtil
+			.get(VIDEO_URL, queryParams, Collections.emptyMap(), SearchVideoResponseDTO.class)
+			.join();
 
 		return searchVideoResponseDTO.getItems().stream().map(this::mapItemToVideoDTO).toList();
 	}

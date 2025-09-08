@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const baseApi = axios.create({
-  baseURL: "http://yt.sonbn.xyz",
+  baseURL: "https://yt.sonbn.xyz",
 });
 
 export { baseApi };
