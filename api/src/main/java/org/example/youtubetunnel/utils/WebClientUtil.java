@@ -79,25 +79,14 @@ public class WebClientUtil {
 		return spec;
 	}
 
-	public <R> CompletableFuture<R> get(String uri, Map<String, String> queryParams, Map<String, String> headers,
-			Class<R> responseType) {
-		WebClient.RequestHeadersSpec<?> request = applyHeaders(webClient.get().uri(builder -> {
-			builder.path(uri);
-			if (queryParams != null) {
-				queryParams.forEach(builder::queryParam);
-			}
-			return builder.build();
-		}), headers);
+	public <R> CompletableFuture<R> get(String uri, Map<String, String> headers, Class<R> responseType) {
+		WebClient.RequestHeadersSpec<?> request = applyHeaders(webClient.get().uri(uri), headers);
 
 		return execute(handleErrors(request).bodyToMono(responseType), uri);
 	}
 
 	public <R> CompletableFuture<R> get(String uri, Class<R> responseType) {
-		return get(uri, null, null, responseType);
-	}
-
-	public <R> CompletableFuture<R> get(String uri, Map<String, String> headers, Class<R> responseType) {
-		return get(uri, null, headers, responseType);
+		return get(uri, null, responseType);
 	}
 
 	public <T, R> CompletableFuture<R> post(String uri, T requestBody, Map<String, String> headers,

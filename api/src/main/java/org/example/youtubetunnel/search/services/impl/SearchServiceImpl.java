@@ -9,12 +9,16 @@ import org.example.youtubetunnel.search.services.SearchService;
 import org.example.youtubetunnel.utils.WebClientUtil;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,15 +37,24 @@ public class SearchServiceImpl implements SearchService {
 		Map<String, String> queryParams = new HashMap<>();
 		queryParams.put("part", part);
 		queryParams.put("type", type);
-		queryParams.put("query", query);
+		queryParams.put("q", query);
 		queryParams.put("maxResults", String.valueOf(maxResults));
 		queryParams.put("key", configProperties.key());
 
-		SearchVideoResponseDTO searchVideoResponseDTO = webClientUtil
-			.get(VIDEO_URL, queryParams, Collections.emptyMap(), SearchVideoResponseDTO.class)
-			.join();
+		String uri = configProperties.host() + VIDEO_URL + "?"
+				+ queryParams.entrySet()
+					.stream()
+					.map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
+					.collect(Collectors.joining("&"));
+
+		SearchVideoResponseDTO searchVideoResponseDTO = webClientUtil.get(uri, SearchVideoResponseDTO.class).join();
 
 		return searchVideoResponseDTO.getItems().stream().map(this::mapItemToVideoDTO).toList();
+	}
+
+	@Override
+	public String getCredential() {
+		return configProperties.key();
 	}
 
 	private VideoDTO mapItemToVideoDTO(SearchVideoResponseDTO.Item item) {
@@ -51,19 +64,28 @@ public class SearchServiceImpl implements SearchService {
 
 		SearchVideoResponseDTO.Thumbnails thumbnails = item.getSnippet().getThumbnails();
 
-		CompletableFuture<String> defaultThumb = webClientUtil
-			.getFullUrl(thumbnails.getDefaultThumbnail().getUrl(), byte[].class)
-			.thenApply(bytes -> Base64.getEncoder().encodeToString(bytes));
+		CompletableFuture<String> defaultThumb = Optional.ofNullable(thumbnails.getDefaultThumbnail())
+			.map(t -> webClientUtil.getFullUrl(t.getUrl(), byte[].class)
+				.thenApply(bytes -> Base64.getEncoder().encodeToString(bytes)))
+			.orElse(CompletableFuture.completedFuture(null));
 
-		CompletableFuture<String> mediumThumb = webClientUtil.getFullUrl(thumbnails.getMedium().getUrl(), byte[].class)
-			.thenApply(bytes -> Base64.getEncoder().encodeToString(bytes));
+		CompletableFuture<String> mediumThumb = Optional.ofNullable(thumbnails.getMedium())
+			.map(t -> webClientUtil.getFullUrl(t.getUrl(), byte[].class)
+				.thenApply(bytes -> Base64.getEncoder().encodeToString(bytes)))
+			.orElse(CompletableFuture.completedFuture(null));
 
-		CompletableFuture<String> highThumb = webClientUtil.getFullUrl(thumbnails.getHigh().getUrl(), byte[].class)
-			.thenApply(bytes -> Base64.getEncoder().encodeToString(bytes));
+		CompletableFuture<String> highThumb = Optional.ofNullable(thumbnails.getHigh())
+			.map(t -> webClientUtil.getFullUrl(t.getUrl(), byte[].class)
+				.thenApply(bytes -> Base64.getEncoder().encodeToString(bytes)))
+			.orElse(CompletableFuture.completedFuture(null));
 
-		List<String> base64Thumbnails = CompletableFuture.allOf(defaultThumb, mediumThumb, highThumb)
-			.thenApply(v -> List.of(defaultThumb.join(), mediumThumb.join(), highThumb.join()))
-			.join();
+		String bestThumb = CompletableFuture.allOf(defaultThumb, mediumThumb, highThumb).thenApply(v -> {
+			if (defaultThumb.join() != null)
+				return defaultThumb.join();
+			if (mediumThumb.join() != null)
+				return mediumThumb.join();
+			return highThumb.join();
+		}).join();
 
 		return VideoDTO.builder()
 			.publishTime(item.getSnippet().getPublishTime())
@@ -72,7 +94,7 @@ public class SearchServiceImpl implements SearchService {
 			.id(item.getId().getVideoId())
 			.description(item.getSnippet().getDescription())
 			.channelTitle(item.getSnippet().getChannelTitle())
-			.thumbnails(base64Thumbnails)
+			.thumbnails(List.of(bestThumb))
 			.build();
 	}
 
