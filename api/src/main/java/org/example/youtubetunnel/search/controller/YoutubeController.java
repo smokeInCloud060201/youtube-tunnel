@@ -20,7 +20,7 @@ public class YoutubeController {
 	@GetMapping
 	public List<VideoDTO> getVideo(@RequestParam(name = "part", defaultValue = "snippet") String part,
 			@RequestParam(name = "type", defaultValue = "video") String type, @RequestParam(name = "q") String query,
-			@RequestParam(name = "maxResults", defaultValue = "5") int maxResults) {
+			@RequestParam(name = "maxResults", defaultValue = "50") int maxResults) {
 		return searchService.searchVideo(part, type, query, maxResults);
 	}
 
