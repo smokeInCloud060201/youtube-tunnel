@@ -29,6 +29,8 @@ steps:
         from_secret: DOCKER_USERNAME
       password:
         from_secret: DOCKER_PASSWORD
+      YOUTUBE_API_KEY:
+        from_secret: YOUTUBE_API_KEY
       context: api
       dockerfile: api/Dockerfile
 
