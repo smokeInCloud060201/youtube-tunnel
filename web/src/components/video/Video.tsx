@@ -18,7 +18,7 @@ const Video = ({ id }: Props) => {
 
     setQuality(newQuality);
 
-    video.src = `http://yt.sonbn.xyz/api/public/stream/v1?url=${id}&enableVideo=true&quality=${newQuality}`;
+    video.src = `https://yt.sonbn.xyz/api/public/stream/v1?url=${id}&enableVideo=true&quality=${newQuality}`;
 
     video.onloadedmetadata = async () => {
       video.currentTime = currentTime;
@@ -35,7 +35,7 @@ const Video = ({ id }: Props) => {
     <div className="app-video relative w-[640px] h-[360px]">
       <video ref={videoRef} className="w-full h-full bg-black" muted>
         <source
-          src={`http://yt.sonbn.xyz/api/public/stream/v1?url=${id}&enableVideo=true&quality=${quality}`}
+          src={`https://yt.sonbn.xyz/api/public/stream/v1?url=${id}&enableVideo=true&quality=${quality}`}
           type="video/mp4"
         />
       </video>
