@@ -1,1 +1,1 @@
-export { default as Video } from "./Video.tsx";
+export { default as VideoPlayer } from "./VideoPlayer";

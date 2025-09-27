@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const baseApi = axios.create({
-  baseURL: "https://yt.sonbn.xyz",
+  baseURL: "http://localhost:8080",
 });
 
 export { baseApi };

@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  api:
+    image: youtube-tunnel-api:${IMAGE_TAG}
+    container_name: api
+    networks:
+      - yt-network
+    ports:
+      - "8088:8080"
+
+  worker:
+    image: youtube-tunnel-worker:${IMAGE_TAG}
+    container_name: worker
+    networks:
+      - yt-network
+    ports:
+      - "8089:8080"
+
+  web:
+    image: youtube-tunnel-web:${IMAGE_TAG}
+    container_name: web
+    networks:
+      - yt-network
+    ports:
+      - "8090:80"
+
+networks:
+  yt-network:
+    external: true

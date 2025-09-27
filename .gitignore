@@ -5,3 +5,11 @@
 ./api/.gradle
 ./api/.gradle/*
 ./api/src/resources/static/*
+./.idea
+**/.gradle
+**/build
+.idea
+.idea/**
+.idea/*
+./docker-compose.yml
+./jenkins_data
