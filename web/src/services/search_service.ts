@@ -1,8 +1,7 @@
-import { useApi } from "@/services/useApi.ts";
+import { baseApi } from "@/services/api.base.ts";
 
 const searchVideo = (query: string) => {
-  const api = useApi();
-  return api.get("/api/private/search/v1", { params: { query } });
+  return baseApi.get("/api/v1/search", { params: { q: query } });
 };
 
 export { searchVideo };

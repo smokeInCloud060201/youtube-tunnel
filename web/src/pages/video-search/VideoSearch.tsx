@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
-import { baseApi } from "@/services";
 import VideoSearchList from "@/pages/video-search/VideoSearchList.tsx";
+import { searchVideo } from "@/services/search_service.ts";
 
 const VideoSearch = () => {
   const { search } = useLocation();
@@ -12,17 +12,14 @@ const VideoSearch = () => {
 
   const handleSearch = useCallback(async (queryText: string | null) => {
     if (queryText) {
-      const { data } = await baseApi.get("/api/private/search/v1", {
-        headers: { Authorization: `Bearer ${queryText}` },
-        params: { q: queryText },
-      });
+      const { data } = await searchVideo(queryText);
       setSearchResult(data);
     }
   }, []);
 
   useEffect(() => {
     handleSearch(queryText);
-  }, [queryText]);
+  }, [handleSearch, queryText]);
 
   return (
     <div>

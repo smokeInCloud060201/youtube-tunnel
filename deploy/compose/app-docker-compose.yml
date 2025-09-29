@@ -6,6 +6,9 @@ services:
     container_name: api
     networks:
       - yt-network
+    environment:
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      YOUTUBE_BASE_HOST: ${YOUTUBE_BASE_HOST}
     ports:
       - "8088:8080"
 

@@ -7,3 +7,20 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092
 
+config:
+  key: ${YOUTUBE_API_KEY:key}
+  host: ${YOUTUBE_BASE_HOST:https://www.googleapis.com}
+
+cors:
+  cors-list:
+    - http://localhost:5173
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health

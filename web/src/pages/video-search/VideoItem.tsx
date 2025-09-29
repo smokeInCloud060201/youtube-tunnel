@@ -26,7 +26,7 @@ const VideoItem = ({ data }: Props) => {
         <div>
           <img
             className="rounded-2xl"
-            src={`data:image/jpeg;base64, ${thumbnails[1]}`}
+            src={`data:image/jpeg;base64, ${thumbnails[0]}`}
             alt={"Thumbnail"}
           />
         </div>
@@ -46,5 +46,4 @@ const VideoItem = ({ data }: Props) => {
   );
 };
 
-// @ts-ignore
 export default VideoItem;

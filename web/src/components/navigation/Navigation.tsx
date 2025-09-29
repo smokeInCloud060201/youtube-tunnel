@@ -22,7 +22,13 @@ const Navigation = () => {
       <div className="w-full h-full flex items-center justify-between mx-6">
         <div className="flex items-center justify-center gap-6">
           <NavMenu className="cursor-pointer" />
-          <YoutubeLogo className="cursor-pointer" />
+          <YoutubeLogo
+            className="cursor-pointer"
+            onClick={() => {
+              console.log("Click");
+              navigate("/", { replace: true });
+            }}
+          />
         </div>
         <div>
           <Search
