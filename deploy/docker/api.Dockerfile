@@ -24,7 +24,7 @@ RUN --mount=type=cache,target=/home/gradle/.gradle \
 
 COPY . .
 
-RUN chmod +x gradlew
+RUN chmod +x gradlew && dos2unix ./gradlew
 
 RUN --mount=type=cache,target=/home/gradle/.gradle \
     ./gradlew --no-daemon bootJar -x test
@@ -34,9 +34,9 @@ FROM eclipse-temurin:21-jre AS final
 
 WORKDIR /app
 
-COPY --from=build /build/worker/build/libs/*-SNAPSHOT.jar app.jar
+COPY --from=build /build/mainservice/build/libs/*-SNAPSHOT.jar app.jar
 
-USER app:app
+USER 1000
 
 EXPOSE 8080
 

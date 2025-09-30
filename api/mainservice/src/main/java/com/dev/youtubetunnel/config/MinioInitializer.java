@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import java.util.Arrays;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MinioInitializer {
@@ -20,14 +23,25 @@ public class MinioInitializer {
 
     @PostConstruct
     public void init() throws Exception {
-        boolean exists = minioClient.bucketExists(
-                BucketExistsArgs.builder().bucket("videos").build()
-        );
-        if (!exists) {
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket("videos").build());
-            System.out.println("Created bucket: videos");
-        } else {
-            System.out.println("Bucket already exists: videos");
+        for (int i = 0; i < 5; i++) {
+            try {
+                boolean exists = minioClient.bucketExists(
+                        BucketExistsArgs.builder().bucket("videos").build()
+                );
+                if (!exists) {
+                    minioClient.makeBucket(
+                            MakeBucketArgs.builder().bucket("videos").build()
+                    );
+                    log.info("Created bucket: {}", "videos");
+                } else {
+                    log.info("Bucket already exists: {}", "videos");
+                }
+                return;
+            } catch (Exception e) {
+                System.out.println("MinIO not ready yet, retrying in 3s...");
+                Thread.sleep(3000);
+            }
         }
+        throw new IllegalStateException("Could not connect to MinIO after 5 retries");
     }
 }

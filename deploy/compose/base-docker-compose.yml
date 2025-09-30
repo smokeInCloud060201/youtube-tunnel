@@ -26,14 +26,15 @@ services:
 
   redis:
     image: redis:7.2
-    container_name: redis
+    container_name: yt-redis
     restart: unless-stopped
+    networks:
+      - yt-network
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
     command: [ "redis-server", "--appendonly", "yes" ]
-
 
 
   minio:
@@ -42,11 +43,21 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    expose:
+      - "9000"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin123
+      MINIO_ROOT_USER: ${MINIO_USERNAME}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
     networks:
       - yt-network
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.minio.rule=Host(`minio.sonbn.xyz`)"
+      - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.routers.minio.tls.certresolver=le"
+      - "traefik.http.services.minio.loadbalancer.server.port=9000"
+      - "traefik.http.routers.minio.priority=10"
     volumes:
       - minio-data:/data
     command: server /data --console-address ":9001"
@@ -58,4 +69,6 @@ volumes:
 
 networks:
   yt-network:
+    external: true
+  proxy:
     external: true

@@ -1,6 +1,9 @@
 package com.dev.youtubetunnel.config;
 
 import io.minio.MinioClient;
+import io.minio.MinioProperties;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -9,14 +12,19 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
+@Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class ApplicationConfiguration {
+
+    private final MinIOProperties minioProperties;
 
     @Bean
     public MinioClient minioClient() {
+        log.info("Initial MinIO at: {}", minioProperties.externalUrl());
         return MinioClient.builder()
-                .endpoint("http://localhost:9000")
-                .credentials("minioadmin", "minioadmin123")
+                .endpoint(minioProperties.externalUrl())
+                .credentials(minioProperties.username(), minioProperties.password())
                 .build();
     }
 

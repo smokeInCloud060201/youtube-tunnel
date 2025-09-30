@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/video-player")
+@RequestMapping("/v1/video-player")
 @CrossOrigin
 @RequiredArgsConstructor
 public class VideoPlayerController {

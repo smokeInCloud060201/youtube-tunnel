@@ -128,10 +128,10 @@ public class VideoJobConsumer implements Runnable {
         );
 
         ProcessBuilder ytPb = new ProcessBuilder(
-                "/home/ngockhanh/yt-dlp-venv/bin/yt-dlp",
+                "yt-dlp",
                 "--no-playlist",
                 "--cookies", cookiePath.toAbsolutePath().toString(),
-                "-f", "bv*+ba/b",
+                "-f", "bv*[vcodec^=avc1]+ba/b",
                 "-o", "-",
                 request.youtubeUrl()
         );

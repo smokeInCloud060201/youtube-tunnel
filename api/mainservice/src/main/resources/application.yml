@@ -12,6 +12,10 @@ config:
   key: ${YOUTUBE_API_KEY:key}
   host: ${YOUTUBE_BASE_HOST:https://www.googleapis.com}
 
+minio:
+  externalUrl: ${MINIO_EXTERNAL_URL:http://localhost:1111}
+  username: ${MINIO_USERNAME:user}
+  password: ${MINIO_PASSWORD:password}
 cors:
   cors-list:
     - http://localhost:5173
@@ -24,4 +28,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: "*"

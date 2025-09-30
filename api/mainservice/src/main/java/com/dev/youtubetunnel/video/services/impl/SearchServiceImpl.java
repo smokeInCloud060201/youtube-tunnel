@@ -46,6 +46,8 @@ public class SearchServiceImpl implements SearchService {
                 .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
                 .collect(Collectors.joining("&"));
 
+        log.info("Search with params {} {} {}", part, type, query);
+
         SearchVideoResponseDTO searchVideoResponseDTO = webClientUtil.get(uri, SearchVideoResponseDTO.class).join();
 
         return searchVideoResponseDTO.getItems().stream().map(this::mapItemToVideoDTO).toList();

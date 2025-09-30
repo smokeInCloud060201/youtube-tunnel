@@ -24,7 +24,7 @@ RUN --mount=type=cache,target=/home/gradle/.gradle \
 
 COPY . .
 
-RUN chmod +x gradlew
+RUN chmod +x gradlew && dos2unix ./gradlew
 
 RUN --mount=type=cache,target=/home/gradle/.gradle \
     ./gradlew --no-daemon bootJar -x test
@@ -42,10 +42,14 @@ RUN apt-get update && apt-get install -y \
         pkg-config yasm nasm libx264-dev libx265-dev \
         libvpx-dev libfdk-aac-dev libopus-dev libass-dev \
         libfreetype6-dev libvorbis-dev libmp3lame-dev \
+        libssl-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+
+ENV YT_DLP_VERSION=2025.09.26
+
 RUN python3 -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir yt-dlp==2024.04.09 \
+    && /opt/venv/bin/pip install --no-cache-dir yt-dlp==$YT_DLP_VERSION \
     && ln -s /opt/venv/bin/yt-dlp /usr/local/bin/yt-dlp \
     && ln -s /opt/venv/bin/python3 /usr/local/bin/python3
 
@@ -59,6 +63,7 @@ RUN mkdir -p /opt/ffmpeg \
         --prefix=/usr/local \
         --enable-gpl \
         --enable-nonfree \
+        --enable-openssl \
         --enable-libx264 \
         --enable-libx265 \
         --enable-libvpx \
@@ -71,9 +76,9 @@ RUN mkdir -p /opt/ffmpeg \
     && make clean \
     && rm -rf /opt/ffmpeg
 
-USER app:app
+USER 1000
 
-EXPOSE 8080
+EXPOSE 8081
 
 ENV JAVA_OPTS="-Xms128m -Xmx256m"
 
