@@ -70,7 +70,7 @@ public class VideoPlayerServiceImpl implements VideoPlayerService {
                                                 .bucket(BUCKET)
                                                 .object(jobId + "/" + line)
                                                 .method(Method.GET)
-                                                .expiry(3600)
+                                                .expiry(86400)
                                                 .build()
                                 );
                             } catch (Exception e) {

@@ -46,7 +46,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ jobId }) => {
     <video
       ref={videoRef}
       controls
-      autoPlay
+      autoPlay={true}
       style={{ height: "calc(100vh - 120px)", width: "100%", margin: "0 24px" }}
     />
   );
