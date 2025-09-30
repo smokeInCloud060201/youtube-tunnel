@@ -35,14 +35,14 @@ import java.util.stream.Collectors;
 public class VideoPlayerServiceImpl implements VideoPlayerService {
 
     private final MinioClient minioClient;
-    private final VideoJobPublisher videoJobPublisher;
+    private final VideoJobProducer videoJobProducer;
     private static final String BUCKET = "videos";
 
     @Override
     public String submitVideoJob(String videoSourceUrl) {
         String jobId = getJobId(videoSourceUrl);
         VideoJobRequest job = new VideoJobRequest(jobId, videoSourceUrl);
-        videoJobPublisher.publish(job);
+        videoJobProducer.produceJob(job);
 
         log.info("Video Job Request: {} {}", job, videoSourceUrl);
         return jobId;

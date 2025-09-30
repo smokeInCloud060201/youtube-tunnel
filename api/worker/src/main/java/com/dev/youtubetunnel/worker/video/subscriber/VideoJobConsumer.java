@@ -1,15 +1,23 @@
 package com.dev.youtubetunnel.worker.video.subscriber;
 
 import com.dev.youtubetunnel.common.dto.VideoJobRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.MinioClient;
+import io.minio.StatObjectArgs;
 import io.minio.UploadObjectArgs;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.dao.QueryTimeoutException;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,18 +26,95 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Service
-@RequiredArgsConstructor
 @Slf4j
-public class VideoJobSubscriberProxy {
+@Component
+@RequiredArgsConstructor
+public class VideoJobConsumer implements Runnable {
 
     private final MinioClient minioClient;
+    private final RedisTemplate<String, VideoJobRequest> redisTemplate;
+    private ExecutorService executor;
 
+    @PostConstruct
+    public void startWorker() {
+        executor = Executors.newVirtualThreadPerTaskExecutor();
+        for (int i = 0; i < 9; i++) {
+            executor.submit(this);
+        }
+    }
 
-    @Async("workerConsumeThreadPool")
+    @PreDestroy
+    public void stopWorker() {
+        if (executor != null) {
+            executor.shutdownNow();
+            log.info("Shutting down worker...");
+        }
+    }
+
+    @Override
+    public void run() {
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                List<byte[]> result = redisTemplate.execute(
+                        (RedisCallback<List<byte[]>>) connection ->
+                                connection.listCommands().bRPop(0, "job-queue".getBytes(StandardCharsets.UTF_8))
+                );
+
+                if (result != null && result.size() == 2) {
+                    byte[] payload = result.get(1);
+                    VideoJobRequest job = (VideoJobRequest) redisTemplate.getValueSerializer().deserialize(payload);
+
+                    if (job != null) {
+                        log.info("Received Job Request: {}", job);
+                        handleJob(job);
+                    } else {
+                        log.warn("Failed to deserialize job payload: {}", new String(payload, StandardCharsets.UTF_8));
+                    }
+                }
+            }
+            catch (QueryTimeoutException ignored) {
+
+            }
+            catch (Exception e) {
+                log.error("Error consuming job", e);
+            }
+        }
+    }
+
+    private void handleJob(VideoJobRequest videoJobMessage) {
+        try {
+            log.info("Received VideoJobRequest: {}", videoJobMessage);
+
+            if (StringUtils.isEmpty(videoJobMessage.jobId()) || objectExists("videos", videoJobMessage.jobId() + "/playlist.m3u8")) {
+                log.info("Job is invalid or already exists {}", videoJobMessage.jobId());
+                return;
+            }
+
+            consumeData(videoJobMessage);
+        } catch (IOException | InterruptedException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean objectExists(String bucket, String object) {
+        try {
+            minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(object)
+                            .build()
+            );
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public void consumeData(VideoJobRequest request) throws IOException, InterruptedException {
         String jobId = request.jobId();
         Path workDir = Files.createTempDirectory("video-" + jobId);
@@ -164,4 +249,5 @@ public class VideoJobSubscriberProxy {
         log.info("Video processing completed for job {}", jobId);
         executor.shutdown();
     }
+
 }
