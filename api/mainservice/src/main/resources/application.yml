@@ -4,9 +4,10 @@ server:
 spring:
   application:
     name: Youtube Tunnel Main Service
-  kafka:
-    bootstrap-servers: localhost:29092
-
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 config:
   key: ${YOUTUBE_API_KEY:key}
   host: ${YOUTUBE_BASE_HOST:https://www.googleapis.com}

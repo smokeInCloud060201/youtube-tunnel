@@ -1,4 +1,4 @@
-package com.dev.youtubetunnel.common.kafka.dto;
+package com.dev.youtubetunnel.common.dto;
 
 import java.io.Serializable;
 

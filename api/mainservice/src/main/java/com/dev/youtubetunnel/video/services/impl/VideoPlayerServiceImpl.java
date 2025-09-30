@@ -1,6 +1,6 @@
 package com.dev.youtubetunnel.video.services.impl;
 
-import com.dev.youtubetunnel.common.kafka.dto.VideoJobRequest;
+import com.dev.youtubetunnel.common.dto.VideoJobRequest;
 import com.dev.youtubetunnel.video.services.VideoPlayerService;
 import io.minio.GetObjectArgs;
 import io.minio.GetPresignedObjectUrlArgs;
@@ -15,7 +15,6 @@ import io.minio.errors.XmlParserException;
 import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -35,15 +34,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class VideoPlayerServiceImpl implements VideoPlayerService {
 
-    private final KafkaTemplate<String, VideoJobRequest> kafkaTemplate;
     private final MinioClient minioClient;
+    private final VideoJobPublisher videoJobPublisher;
     private static final String BUCKET = "videos";
 
     @Override
     public String submitVideoJob(String videoSourceUrl) {
         String jobId = getJobId(videoSourceUrl);
         VideoJobRequest job = new VideoJobRequest(jobId, videoSourceUrl);
-        kafkaTemplate.send("video-jobs", job);
+        videoJobPublisher.publish(job);
 
         log.info("Video Job Request: {} {}", job, videoSourceUrl);
         return jobId;

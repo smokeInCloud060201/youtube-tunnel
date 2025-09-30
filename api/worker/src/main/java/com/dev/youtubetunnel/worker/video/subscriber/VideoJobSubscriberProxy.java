@@ -1,6 +1,6 @@
-package com.dev.youtubetunnel.worker.video.consumer;
+package com.dev.youtubetunnel.worker.video.subscriber;
 
-import com.dev.youtubetunnel.common.kafka.dto.VideoJobRequest;
+import com.dev.youtubetunnel.common.dto.VideoJobRequest;
 import io.minio.MinioClient;
 import io.minio.UploadObjectArgs;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class VideoJobConsumerProxy {
+public class VideoJobSubscriberProxy {
 
     private final MinioClient minioClient;
 

@@ -1,5 +1,6 @@
 package com.dev.youtubetunnel.worker.base.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.MinioClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,4 +30,8 @@ public class ApplicationConfiguration {
         return executor;
     }
 
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 }
