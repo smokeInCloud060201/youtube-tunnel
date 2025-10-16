@@ -1,7 +1,6 @@
 package com.dev.youtubetunnel.worker.video.subscriber;
 
 import com.dev.youtubetunnel.common.dto.VideoJobRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.minio.MinioClient;
 import io.minio.StatObjectArgs;
 import io.minio.UploadObjectArgs;
@@ -18,14 +17,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -154,7 +148,7 @@ public class VideoJobConsumer implements Runnable {
                 "-af", "aresample=async=1",
                 "-hls_time", "6",
                 "-hls_list_size", "5",
-                "-hls_flags", "delete_segments+independent_segments",
+                "-hls_flags", "independent_segments",
                 "-start_number", "0",
                 "-f", "hls",
                 playlist.toString()
@@ -175,38 +169,18 @@ public class VideoJobConsumer implements Runnable {
         });
 
         executor.submit(() -> {
-            long lastPlaylistUpdateTime = 0L;
-
-            try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
-                workDir.register(
-                        watcher,
-                        StandardWatchEventKinds.ENTRY_CREATE,
-                        StandardWatchEventKinds.ENTRY_MODIFY
-                );
+            try {
+                final long[] lastPlaylistUploadTime = {0L};
+                var uploadedFiles = new java.util.HashSet<String>();
 
                 while (ffProcess.isAlive()) {
-                    WatchKey key = watcher.take();
-                    for (WatchEvent<?> event : key.pollEvents()) {
-                        Path file = workDir.resolve((Path) event.context());
-                        String filename = file.getFileName().toString();
+                    try (var files = Files.list(workDir)) {
+                        files.forEach(file -> {
+                            try {
+                                String filename = file.getFileName().toString();
 
-                        try {
-                            if (filename.endsWith(".ts")) {
-                                minioClient.uploadObject(
-                                        UploadObjectArgs.builder()
-                                                .bucket("videos")
-                                                .object(jobId + "/" + filename)
-                                                .filename(file.toString())
-                                                .build()
-                                );
-                                log.info("Uploaded segment {}", filename);
-
-                            } else if (filename.endsWith(".m3u8")) {
-                                long lastModified = Files.getLastModifiedTime(file).toMillis();
-
-                                if (lastModified > lastPlaylistUpdateTime) {
-                                    lastPlaylistUpdateTime = lastModified;
-
+                                // Upload .ts segments once
+                                if (filename.endsWith(".ts") && !uploadedFiles.contains(filename)) {
                                     minioClient.uploadObject(
                                             UploadObjectArgs.builder()
                                                     .bucket("videos")
@@ -214,17 +188,37 @@ public class VideoJobConsumer implements Runnable {
                                                     .filename(file.toString())
                                                     .build()
                                     );
-                                    log.info("Uploaded updated playlist {}", filename);
+                                    uploadedFiles.add(filename);
+                                    log.info("Uploaded segment {}", filename);
+
+                                    // Optional cleanup: delete segment after upload
+                                     Files.deleteIfExists(file);
                                 }
+
+                                // Upload updated playlist only if changed
+                                else if (filename.endsWith(".m3u8")) {
+                                    long lastModified = Files.getLastModifiedTime(file).toMillis();
+                                    if (lastModified > lastPlaylistUploadTime[0]) {
+                                        lastPlaylistUploadTime[0] = lastModified;
+                                        minioClient.uploadObject(
+                                                UploadObjectArgs.builder()
+                                                        .bucket("videos")
+                                                        .object(jobId + "/" + filename)
+                                                        .filename(file.toString())
+                                                        .build()
+                                        );
+                                        log.info("Uploaded updated playlist {}", filename);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                log.error("Failed upload {}", file.getFileName(), e);
                             }
-                        } catch (Exception e) {
-                            log.error("Failed upload {}", filename, e);
-                        }
+                        });
                     }
-                    key.reset();
+                    Thread.sleep(2000);
                 }
             } catch (Exception e) {
-                log.error("Watcher failed", e);
+                log.error("Uploader loop failed", e);
             }
         });
 
