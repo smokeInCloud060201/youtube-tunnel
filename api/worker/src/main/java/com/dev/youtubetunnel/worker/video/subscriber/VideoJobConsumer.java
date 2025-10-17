@@ -147,7 +147,7 @@ public class VideoJobConsumer implements Runnable {
                 "-ar", "44100",
                 "-af", "aresample=async=1",
                 "-hls_time", "6",
-                "-hls_list_size", "5",
+                "-hls_list_size", "0",
                 "-hls_flags", "independent_segments",
                 "-start_number", "0",
                 "-f", "hls",
@@ -157,91 +157,57 @@ public class VideoJobConsumer implements Runnable {
         ffPb.redirectError(ProcessBuilder.Redirect.INHERIT);
         Process ffProcess = ffPb.start();
 
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
-        executor.submit(() -> {
-            try (var in = ytProcess.getInputStream();
-                 var out = ffProcess.getOutputStream()) {
+        Thread pipeThread = Thread.startVirtualThread(() -> {
+            try (var in = ytProcess.getInputStream(); var out = ffProcess.getOutputStream()) {
                 in.transferTo(out);
             } catch (IOException e) {
                 log.error("Pipe failed", e);
             }
         });
 
-        executor.submit(() -> {
-            try {
-                final long[] lastPlaylistUploadTime = {0L};
-                var uploadedFiles = new java.util.HashSet<String>();
-
-                while (ffProcess.isAlive()) {
-                    try (var files = Files.list(workDir)) {
-                        files.forEach(file -> {
-                            try {
-                                String filename = file.getFileName().toString();
-
-                                // Upload .ts segments once
-                                if (filename.endsWith(".ts") && !uploadedFiles.contains(filename)) {
-                                    minioClient.uploadObject(
-                                            UploadObjectArgs.builder()
-                                                    .bucket("videos")
-                                                    .object(jobId + "/" + filename)
-                                                    .filename(file.toString())
-                                                    .build()
-                                    );
-                                    uploadedFiles.add(filename);
-                                    log.info("Uploaded segment {}", filename);
-
-                                    // Optional cleanup: delete segment after upload
-                                     Files.deleteIfExists(file);
-                                }
-
-                                // Upload updated playlist only if changed
-                                else if (filename.endsWith(".m3u8")) {
-                                    long lastModified = Files.getLastModifiedTime(file).toMillis();
-                                    if (lastModified > lastPlaylistUploadTime[0]) {
-                                        lastPlaylistUploadTime[0] = lastModified;
-                                        minioClient.uploadObject(
-                                                UploadObjectArgs.builder()
-                                                        .bucket("videos")
-                                                        .object(jobId + "/" + filename)
-                                                        .filename(file.toString())
-                                                        .build()
-                                        );
-                                        log.info("Uploaded updated playlist {}", filename);
-                                    }
-                                }
-                            } catch (Exception e) {
-                                log.error("Failed upload {}", file.getFileName(), e);
-                            }
-                        });
-                    }
-                    Thread.sleep(2000);
-                }
-            } catch (Exception e) {
-                log.error("Uploader loop failed", e);
-            }
-        });
-
         ytProcess.waitFor();
         ffProcess.waitFor();
+        pipeThread.join();
 
-        try {
-            if (Files.exists(playlist)) {
-                minioClient.uploadObject(
-                        UploadObjectArgs.builder()
-                                .bucket("videos")
-                                .object(jobId + "/playlist.m3u8")
-                                .filename(playlist.toString())
-                                .build()
-                );
-                log.info("Final upload of playlist.m3u8 for job {}", jobId);
+        log.info("Transcoding complete for {}", jobId);
+
+        // Now upload synchronously, in order
+        try (var stream = Files.list(workDir)) {
+            List<Path> files = stream
+                    .filter(Files::isRegularFile)
+                    .sorted((a, b) -> {
+                        // Sort numerically for .ts files
+                        String nameA = a.getFileName().toString();
+                        String nameB = b.getFileName().toString();
+                        if (nameA.endsWith(".ts") && nameB.endsWith(".ts")) {
+                            int numA = Integer.parseInt(nameA.replaceAll("\\D", ""));
+                            int numB = Integer.parseInt(nameB.replaceAll("\\D", ""));
+                            return Integer.compare(numA, numB);
+                        }
+                        return nameA.compareTo(nameB);
+                    })
+                    .toList();
+
+            for (Path file : files) {
+                String filename = file.getFileName().toString();
+                try {
+                    minioClient.uploadObject(
+                            UploadObjectArgs.builder()
+                                    .bucket("videos")
+                                    .object(jobId + "/" + filename)
+                                    .filename(file.toString())
+                                    .build()
+                    );
+                    log.info("Uploaded {}", filename);
+                } catch (Exception e) {
+                    log.error("Failed to upload {}", filename, e);
+                }
             }
-        } catch (Exception e) {
-            log.error("Failed final upload playlist.m3u8 for job {}", jobId, e);
         }
 
-        log.info("Video processing completed for job {}", jobId);
-        executor.shutdown();
+        log.info("All segments and playlist uploaded successfully for job {}", jobId);
+
     }
 
 }
