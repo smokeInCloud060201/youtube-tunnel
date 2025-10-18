@@ -12,7 +12,6 @@ const Navigation = () => {
   const navigate = useNavigate();
 
   const goToSearch = () => {
-    console.log("goToSearch ", searchText);
     navigate(`/search?query=${encodeURIComponent(searchText)}`, { replace: false });
     setSearchText("");
   };
@@ -24,9 +23,7 @@ const Navigation = () => {
           <NavMenu className="cursor-pointer" />
           <YoutubeLogo
             className="cursor-pointer"
-            onClick={() => {
-              console.log("Click");
-              navigate("/", { replace: true });
+            onClick={() => { navigate("/")
             }}
           />
         </div>
