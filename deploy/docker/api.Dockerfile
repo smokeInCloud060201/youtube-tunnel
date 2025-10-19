@@ -1,45 +1,41 @@
-################################################################################
-FROM gradle:8.10.2-jdk21 AS build
+ARG RUST_VERSION=1.90.0
+ARG APP_NAME=youtube-tunnel-api
 
-WORKDIR /build
 
-RUN apt-get update && apt-get install -y dos2unix && rm -rf /var/lib/apt/lists/*
-
-COPY --chmod=0755 gradlew gradlew
-RUN chmod +x gradlew && dos2unix ./gradlew
-
-COPY gradle gradle
-COPY gradle/wrapper gradle/wrapper
-COPY build.gradle settings.gradle ./
-COPY common/src common/src
-COPY common/build.gradle common/build.gradle
-
-COPY mainservice/src mainservice/src
-COPY mainservice/gradle mainservice/gradle
-COPY mainservice/gradle/wrapper mainservice/gradle/wrapper
-COPY mainservice/build.gradle mainservice/build.gradle
-
-RUN --mount=type=cache,target=/home/gradle/.gradle \
-    ./gradlew --no-daemon dependencies
-
-COPY . .
-
-RUN chmod +x gradlew && dos2unix ./gradlew
-
-RUN --mount=type=cache,target=/home/gradle/.gradle \
-    ./gradlew --no-daemon bootJar -x test
-
-################################################################################
-FROM eclipse-temurin:21-jre AS final
-
+FROM rust:${RUST_VERSION}-alpine AS build
+ARG APP_NAME
 WORKDIR /app
 
-COPY --from=build /build/mainservice/build/libs/*-SNAPSHOT.jar app.jar
+RUN apk add --no-cache clang lld musl-dev git pkgconfig openssl-dev openssl-libs-static
 
-USER 1000
+ENV OPENSSL_STATIC=1
+
+COPY Cargo.toml Cargo.lock ./
+
+COPY src src
+COPY shared shared
+COPY service service
+COPY web web
+
+RUN cargo build --locked --release && \
+cp ./target/release/$APP_NAME /bin/server
+
+################################################################################
+FROM alpine:3.18 AS final
+
+ARG UID=10001
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    appuser
+USER appuser
+
+COPY --from=build /bin/server /bin/
 
 EXPOSE 8080
 
-ENV JAVA_OPTS="-Xms128m -Xmx256m"
-
-ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
+CMD ["/bin/server"]

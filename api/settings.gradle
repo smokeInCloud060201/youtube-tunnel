@@ -1,5 +1,0 @@
-rootProject.name = 'youtube-tunnel'
-
-include 'mainservice'
-include 'worker'
-include 'common'
