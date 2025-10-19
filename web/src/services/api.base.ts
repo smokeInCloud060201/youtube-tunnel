@@ -1,7 +1,8 @@
 import axios from "axios";
+import { URL_BASE_HOST } from "@/utils/app.config.ts";
 
 const baseApi = axios.create({
-  baseURL: "https://yt.sonbn.xyz",
+  baseURL: URL_BASE_HOST,
 });
 
 export { baseApi };

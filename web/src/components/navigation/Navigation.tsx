@@ -12,7 +12,6 @@ const Navigation = () => {
   const navigate = useNavigate();
 
   const goToSearch = () => {
-    console.log("goToSearch ", searchText);
     navigate(`/search?query=${encodeURIComponent(searchText)}`, { replace: false });
     setSearchText("");
   };
@@ -22,7 +21,11 @@ const Navigation = () => {
       <div className="w-full h-full flex items-center justify-between mx-6">
         <div className="flex items-center justify-center gap-6">
           <NavMenu className="cursor-pointer" />
-          <YoutubeLogo className="cursor-pointer" />
+          <YoutubeLogo
+            className="cursor-pointer"
+            onClick={() => { navigate("/")
+            }}
+          />
         </div>
         <div>
           <Search

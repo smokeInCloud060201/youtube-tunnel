@@ -1,0 +1,26 @@
+[package]
+name = "web"
+version = "0.1.0"
+edition = "2024"
+
+
+[dependencies]
+# Interal
+shared = { path = "../shared" }
+service = { path = "../service" }
+
+# External
+actix-web.workspace = true
+
+dotenvy.workspace = true
+listenfd.workspace = true
+
+
+# Logger
+tracing.workspace = true
+actix-multipart.workspace = true
+futures-util.workspace = true
+
+tokio.workspace = true
+actix-cors.workspace = true
+
