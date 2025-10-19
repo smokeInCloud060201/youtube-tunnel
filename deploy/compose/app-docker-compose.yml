@@ -17,7 +17,7 @@ services:
       - "traefik.http.middlewares.api-strip.stripprefix.prefixes=/api"
       - "traefik.http.routers.yt-api.middlewares=api-strip"
     environment:
-      SERVER_HOST: 127.0.0.1
+      SERVER_HOST: 0.0.0.0
       SERVER_PORT: 8080
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
       YOUTUBE_HOST: ${YOUTUBE_HOST}
@@ -26,7 +26,7 @@ services:
       AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
       AWS_SECRET_ACCESS_KEY: $MINIO_PASSWORD}
       AWS_REGION: us-east-1
-      MINIO_ENDPOINT: ${MINIO_INTERNAL_URL}
+      MINIO_ENDPOINT: ${MINIO_EXTERNAL_URL}
     expose:
       - "8080"
 
@@ -34,7 +34,7 @@ services:
     image: youtube-tunnel-worker:${IMAGE_TAG}
     container_name: worker
     environment:
-      SERVER_HOST: 127.0.0.1
+      SERVER_HOST: 0.0.0.0
       SERVER_PORT: 8081
       REDIS_HOST: yt-redis
       REDIS_PORT: "6379"
