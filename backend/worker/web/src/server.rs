@@ -7,7 +7,8 @@ use shared::config::cookie_credential::YoutubeCookie;
 use shared::config::{logger, minio, redis_pool};
 use std::env;
 use std::sync::Arc;
-use tracing::info;
+use tokio::time::{sleep, Duration};
+use tracing::{info, warn};
 
 pub async fn start() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
@@ -18,10 +19,37 @@ pub async fn start() -> std::io::Result<()> {
     let server_port = env::var("SERVER_PORT").expect("PORT not set in .env file");
     let server_url = format!("{server_host}:{server_port}");
 
-    let redis_pool = redis_pool::init()
-        .await
-        .expect("Failed to create Redis pool");
-    let minio_client = minio::init().await.expect("Failed to initialize minio");
+    let mut attempts = 0;
+    let max_attempts = 10;
+
+    let redis_pool = loop {
+        match redis_pool::init().await {
+            Ok(pool) => break pool,
+            Err(err) => {
+                attempts += 1;
+                if attempts >= max_attempts {
+                    panic!("Redis not ready after {} attempts: {}", max_attempts, err);
+                }
+                warn!("Redis not ready, retrying in 3s: {}", err);
+                sleep(Duration::from_secs(3)).await;
+            }
+        }
+    };
+
+    attempts = 0;
+    let minio_client = loop {
+        match minio::init().await {
+            Ok(client) => break client,
+            Err(err) => {
+                attempts += 1;
+                if attempts >= max_attempts {
+                    panic!("MinIO not ready after {} attempts: {}", max_attempts, err);
+                }
+                warn!("MinIO not ready, retrying in 3s: {}", err);
+                sleep(Duration::from_secs(3)).await;
+            }
+        }
+    };
 
     let cookie_credential = YoutubeCookie::new(minio_client.clone());
 
