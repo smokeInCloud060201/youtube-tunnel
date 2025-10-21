@@ -6,6 +6,8 @@ DOCKER_NETWORK_NAME=yt-network
 IMAGE_TAG=latest
 
 
+.PHONY: clean-api clean-worker clean-backend
+
 build-api-image:
 	$(DOCKER_BIN) rmi -f youtube-tunnel-api:${IMAGE_TAG} || true
 	DOCKER_BUILDKIT=1 $(DOCKER_BIN) build -f $(DOCKER_BASE_PATH)/api.Dockerfile -t youtube-tunnel-api:${IMAGE_TAG} ./backend/api
@@ -32,6 +34,11 @@ service-down:
 
 common-down:
 	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/base-docker-compose.yml down || true
+
+clean-app-images:
+	$(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.yml down --rmi all -v --remove-orphans || true
+	$(DOCKER_BIN) rmi -f youtube-tunnel-api:latest youtube-tunnel-worker:latest youtube-tunnel-web:latest || true
+
 
 deploy: create-network common-down deploy-common service-down deploy-service
 

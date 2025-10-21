@@ -19,6 +19,12 @@ pipeline {
             }
         }
 
+        stage('Clean images') {
+            steps {
+                sh 'make clean-app-images'
+            }
+        }
+
         stage('Build images') {
             parallel {
                 stage('api') {
