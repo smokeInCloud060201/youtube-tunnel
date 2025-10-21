@@ -6,6 +6,10 @@ pub fn init() {
             "RUST_LOG",
             "service=info,service=debug,shared=info,shared=debug,web=info,web=debug,actix_web=info,actix_web=debug,actix_server=info",
         );
+        env::set_var(
+            "RUST_BACKTRACE",
+            "full",
+        );
     }
 
     tracing_subscriber::fmt()

@@ -12,9 +12,11 @@ pub async fn init() -> anyhow::Result<Client> {
 
     let config = aws_config::defaults(BehaviorVersion::latest())
         .region(region)
-        .endpoint_url(minio_url)
+        .endpoint_url(&minio_url)
         .load()
         .await;
+
+    info!("Init MINIO with {}", minio_url);
 
     let client = Client::new(&config);
 
