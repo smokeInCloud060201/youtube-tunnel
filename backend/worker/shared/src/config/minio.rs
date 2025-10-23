@@ -44,7 +44,8 @@ async fn init_bucket(client: &Client, bucket_name: String) -> anyhow::Result<()>
 async fn bucket_exists(client: &Client, bucket_name: &str) -> anyhow::Result<bool> {
     let buckets = client.list_buckets().send().await?;
     Ok(buckets
-        .buckets()
-        .iter()
-        .any(|item| item.name().unwrap_or_default() == bucket_name))
+           .buckets()
+           .unwrap_or_default()
+           .iter()
+           .any(|b| b.name().unwrap_or_default() == bucket_name))
 }
