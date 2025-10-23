@@ -119,8 +119,10 @@ impl JobConsumer {
 
         // yt-dlp -> ffmpeg pipeline
         let mut yt_process = Command::new("yt-dlp")
+            .env("HOME", "/tmp")
             .args([
                 "--no-playlist",
+                "--no-cache-dir",
                 "--cookies",
                 &cookie_path.to_string_lossy(),
                 "-f",
