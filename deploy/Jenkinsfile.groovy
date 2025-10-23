@@ -19,6 +19,15 @@ pipeline {
             }
         }
 
+        stage('Clean images') {
+            steps {
+                sh '''
+                    make clean-api
+                    make clean-worker
+                '''
+            }
+        }
+
         stage('Build images') {
             parallel {
                 stage('api') {
