@@ -47,7 +47,7 @@ RUN tar xzf ffmpeg-$FFMPEG_VERSION.tar.gz && \
 FROM alpine:3.18 AS final
 WORKDIR /app
 
-ARG YT_DLP_VERSION=2025.09.26
+ARG YT_DLP_VERSION=2025.10.22
 
 RUN apk add --no-cache \
     python3 py3-pip libstdc++ libssl3 ca-certificates \
