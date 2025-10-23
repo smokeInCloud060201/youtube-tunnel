@@ -52,7 +52,6 @@ async fn bucket_exists(client: &Client, bucket_name: &str) -> anyhow::Result<boo
 
     let exists = resp
         .buckets()
-        .unwrap_or(&[])
         .iter()
         .any(|b| b.name().unwrap_or_default() == bucket_name);
 
