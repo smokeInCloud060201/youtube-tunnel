@@ -2,6 +2,7 @@ use aws_config::meta::region::RegionProviderChain;
 use aws_config::{BehaviorVersion, Region};
 use aws_sdk_s3::Client;
 use std::env;
+use aws_sdk_s3::config::Credentials;
 use tracing::info;
 
 pub async fn init() -> anyhow::Result<Client> {
@@ -13,6 +14,7 @@ pub async fn init() -> anyhow::Result<Client> {
     let config = aws_config::defaults(BehaviorVersion::latest())
         .region(region)
         .endpoint_url(&minio_url)
+        .credentials_provider(Credentials::new(Some("minioadmin"), Some("minioadmin123"),  None, None, "static"))
         .load()
         .await;
 
@@ -39,7 +41,7 @@ async fn init_bucket(client: &Client, bucket_name: String) -> anyhow::Result<()>
     Ok(())
 }
 
-async fn bucket_exists(client: &Client, bucket_name: &String) -> anyhow::Result<bool> {
+async fn bucket_exists(client: &Client, bucket_name: &str) -> anyhow::Result<bool> {
     let buckets = client.list_buckets().send().await?;
     Ok(buckets
         .buckets()
