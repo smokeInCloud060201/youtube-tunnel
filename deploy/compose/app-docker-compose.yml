@@ -23,8 +23,8 @@ services:
       YOUTUBE_HOST: ${YOUTUBE_HOST}
       REDIS_HOST: yt-redis
       REDIS_PORT: "6379"
-      AWS_ACCESS_KEY_ID: minioadmin
-      AWS_SECRET_ACCESS_KEY: minioadmin123
+      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
       AWS_REGION: us-east-1
       MINIO_ENDPOINT: ${MINIO_EXTERNAL_URL}
     expose:
@@ -38,8 +38,8 @@ services:
       SERVER_PORT: 8081
       REDIS_HOST: yt-redis
       REDIS_PORT: "6379"
-      AWS_ACCESS_KEY_ID: minioadmin
-      AWS_SECRET_ACCESS_KEY: minioadmin123
+      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
       AWS_REGION: us-east-1
       MINIO_ENDPOINT: ${MINIO_INTERNAL_URL}
     networks:

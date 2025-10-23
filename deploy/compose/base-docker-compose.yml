@@ -46,11 +46,11 @@ services:
     expose:
       - "9000"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin123
+      MINIO_ROOT_USER: ${MINIO_USERNAME}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
     networks:
       - yt-network
-#      - proxy
+      - proxy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.rule=Host(`minio.sonbn.xyz`)"
