@@ -14,7 +14,13 @@ pub async fn init() -> anyhow::Result<Client> {
     let config = aws_config::defaults(BehaviorVersion::latest())
         .region(region)
         .endpoint_url(&minio_url)
-        .credentials_provider(Credentials::new(Some("minioadmin"), Some("minioadmin123"),  None, None, "static"))
+        .credentials_provider(Credentials::new(
+            "minioadmin",
+            "minioadmin123",
+            None,
+            None,
+            "static",
+        ))
         .load()
         .await;
 
@@ -42,10 +48,13 @@ async fn init_bucket(client: &Client, bucket_name: String) -> anyhow::Result<()>
 }
 
 async fn bucket_exists(client: &Client, bucket_name: &str) -> anyhow::Result<bool> {
-    let buckets = client.list_buckets().send().await?;
-    Ok(buckets
-           .buckets()
-           .unwrap_or_default()
-           .iter()
-           .any(|b| b.name().unwrap_or_default() == bucket_name))
+    let resp = client.list_buckets().send().await?;
+
+    let exists = resp
+        .buckets()
+        .unwrap_or(&[])
+        .iter()
+        .any(|b| b.name().unwrap_or_default() == bucket_name);
+
+    Ok(exists)
 }
