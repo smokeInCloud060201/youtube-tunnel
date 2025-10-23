@@ -50,7 +50,7 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin123
     networks:
       - yt-network
-      - proxy
+#      - proxy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.rule=Host(`minio.sonbn.xyz`)"
