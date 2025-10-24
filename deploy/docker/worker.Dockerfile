@@ -75,6 +75,8 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
+RUN mkdir -p /app/downloads && chown -R appuser:appuser /app
+
 USER appuser
 EXPOSE 8081
 CMD ["/bin/server"]
