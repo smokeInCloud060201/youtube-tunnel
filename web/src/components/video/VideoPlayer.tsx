@@ -43,13 +43,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({jobId}) => {
                 if (data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR) {
                     console.warn("Retrying playlist load...");
                     setTimeout(() => {
-                        hls.loadSource(`${URL_BASE_HOST}/v1/video-player/${jobId}/playlist?_=${Date.now()}`);
+                        hls.loadSource(`${URL_BASE_HOST}/api/v1/video-player/${jobId}/playlist?_=${Date.now()}`);
                     }, 1000);
                 }
             });
             hlsRef.current = hls;
         } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-            video.src = `${URL_BASE_HOST}/v1/video-player/${jobId}/playlist?_=${Date.now()}`;
+            video.src = `${URL_BASE_HOST}/api/v1/video-player/${jobId}/playlist?_=${Date.now()}`;
         }
 
         return () => {
