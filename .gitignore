@@ -14,3 +14,5 @@ backend/src/resources/static/*
 ./docker-compose.yml
 ./jenkins_data
 **/target/*
+backend/api/.env
+backend/worker/.env
