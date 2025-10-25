@@ -21,10 +21,7 @@ pipeline {
 
         stage('Clean images') {
             steps {
-                sh '''
-                    make clean-api
-                    make clean-worker
-                '''
+                sh 'make clean-app-images'
             }
         }
 

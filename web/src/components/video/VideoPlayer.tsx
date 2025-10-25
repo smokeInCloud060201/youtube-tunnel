@@ -22,7 +22,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({jobId}) => {
                 liveSyncDurationCount: 3,
             });
             hls.attachMedia(video);
-            hls.loadSource(`${URL_BASE_HOST}/api/v1/video-player/${jobId}/playlist`);
+            hls.loadSource(`${URL_BASE_HOST}/v1/video-player/${jobId}/playlist`);
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 video.play().catch((err) => {
                     console.warn("Autoplay failed:", err);
@@ -35,7 +35,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({jobId}) => {
                 if (hasNoSegments) {
                     console.warn("Manifest has no segments — reloading...");
                     setTimeout(() => {
-                        hls.loadSource(`${URL_BASE_HOST}/api/v1/video-player/${jobId}/playlist?_=${Date.now()}`);
+                        hls.loadSource(`${URL_BASE_HOST}/v1/video-player/${jobId}/playlist?_=${Date.now()}`);
                     }, 3000);
                 }
             });
@@ -43,13 +43,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({jobId}) => {
                 if (data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR) {
                     console.warn("Retrying playlist load...");
                     setTimeout(() => {
-                        hls.loadSource(`${URL_BASE_HOST}/api/v1/video-player/${jobId}/playlist?_=${Date.now()}`);
+                        hls.loadSource(`${URL_BASE_HOST}/v1/video-player/${jobId}/playlist?_=${Date.now()}`);
                     }, 3000);
                 }
             });
             hlsRef.current = hls;
         } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-            video.src = `${URL_BASE_HOST}/api/v1/video-player/${jobId}/playlist?_=${Date.now()}`;
+            video.src = `${URL_BASE_HOST}/v1/video-player/${jobId}/playlist?_=${Date.now()}`;
         }
 
         return () => {
