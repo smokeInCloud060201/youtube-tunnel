@@ -36,7 +36,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({jobId}) => {
                     console.warn("Manifest has no segments — reloading...");
                     setTimeout(() => {
                         hls.loadSource(`${URL_BASE_HOST}/api/v1/video-player/${jobId}/playlist?_=${Date.now()}`);
-                    }, 1000);
+                    }, 3000);
                 }
             });
             hls.on(Hls.Events.ERROR, (_event, data) => {
@@ -44,7 +44,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({jobId}) => {
                     console.warn("Retrying playlist load...");
                     setTimeout(() => {
                         hls.loadSource(`${URL_BASE_HOST}/api/v1/video-player/${jobId}/playlist?_=${Date.now()}`);
-                    }, 1000);
+                    }, 3000);
                 }
             });
             hlsRef.current = hls;
