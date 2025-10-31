@@ -7,3 +7,13 @@ export interface VideoItemProps {
   publishTime: string;
   publishedAt: string;
 }
+
+export interface VideoPlayerResponse {
+  jobId: string;
+  status: string;
+}
+
+export interface JobStatusResponse {
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'unknown';
+  progress: number | null;
+}
