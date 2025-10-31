@@ -1,1 +1,1 @@
-export const URL_BASE_HOST = 'http://localhost:8080'
+export const URL_BASE_HOST = 'https://yt.sonbn.xyz/api'
