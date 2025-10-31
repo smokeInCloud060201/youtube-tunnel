@@ -12,9 +12,6 @@ ENV OPENSSL_STATIC=1
 
 COPY Cargo.toml Cargo.lock ./
 COPY src src
-COPY shared shared
-COPY service service
-COPY web web
 
 RUN cargo build --locked --release && cp ./target/release/$APP_NAME /bin/server
 

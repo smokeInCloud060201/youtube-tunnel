@@ -2924,23 +2924,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "service"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aws-sdk-s3",
- "base64 0.22.1",
- "deadpool-redis",
- "futures",
- "reqwest",
- "serde_json",
- "shared",
- "tokio",
- "tokio-cron-scheduler",
- "tracing",
-]
-
-[[package]]
 name = "sha1"
 version = "0.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2969,21 +2952,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f40ca3c46823713e0d4209592e8d6e826aa57e928f09752619fc696c499637f6"
 dependencies = [
  "lazy_static",
-]
-
-[[package]]
-name = "shared"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "anyhow",
- "aws-config",
- "aws-sdk-s3",
- "deadpool-redis",
- "serde",
- "thiserror",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]
@@ -3619,22 +3587,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "web"
-version = "0.1.0"
-dependencies = [
- "actix-cors",
- "actix-multipart",
- "actix-web",
- "dotenvy",
- "futures-util",
- "listenfd",
- "service",
- "shared",
- "tokio",
- "tracing",
-]
-
-[[package]]
 name = "web-sys"
 version = "0.3.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3971,8 +3923,27 @@ dependencies = [
 name = "youtube-tunnel-api"
 version = "0.1.0"
 dependencies = [
+ "actix-cors",
+ "actix-multipart",
  "actix-web",
- "web",
+ "anyhow",
+ "aws-config",
+ "aws-sdk-s3",
+ "base64 0.22.1",
+ "deadpool-redis",
+ "dotenvy",
+ "futures",
+ "futures-util",
+ "listenfd",
+ "log",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tokio-cron-scheduler",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

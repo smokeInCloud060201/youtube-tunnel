@@ -2,64 +2,46 @@ version: '3.8'
 
 services:
   api:
-    image: youtube-tunnel-api:${IMAGE_TAG}
+    image: youtube-tunnel-api:latest
     container_name: yt-api
     networks:
       - yt-network
-      - proxy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.yt-api.rule=Host(`yt.sonbn.xyz`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.yt-api.entrypoints=websecure"
-      - "traefik.http.routers.yt-api.tls.certresolver=le"
-      - "traefik.http.services.yt-api.loadbalancer.server.port=8080"
-      - "traefik.http.routers.yt-api.priority=20"
-      - "traefik.http.middlewares.api-strip.stripprefix.prefixes=/api"
-      - "traefik.http.routers.yt-api.middlewares=api-strip"
     environment:
       SERVER_HOST: 0.0.0.0
       SERVER_PORT: 8080
-      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
-      YOUTUBE_HOST: ${YOUTUBE_BASE_HOST}
+      YOUTUBE_API_KEY: test
+      YOUTUBE_HOST: https://www.googleapis.com
       REDIS_HOST: yt-redis
       REDIS_PORT: "6379"
-      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
-      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin123
       AWS_REGION: us-east-1
-      MINIO_ENDPOINT: ${MINIO_EXTERNAL_URL}
+      MINIO_ENDPOINT: http://minio:9000
     expose:
       - "8080"
 
   worker:
-    image: youtube-tunnel-worker:${IMAGE_TAG}
+    image: youtube-tunnel-worker:latest
     container_name: worker
     environment:
       SERVER_HOST: 0.0.0.0
       SERVER_PORT: 8081
       REDIS_HOST: yt-redis
       REDIS_PORT: "6379"
-      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
-      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin123
       AWS_REGION: us-east-1
-      MINIO_ENDPOINT: ${MINIO_INTERNAL_URL}
+      MINIO_ENDPOINT: http://minio:9000
     networks:
       - yt-network
     expose:
       - "8081"
 
   web:
-    image: youtube-tunnel-web:${IMAGE_TAG}
+    image: youtube-tunnel-web:latest
     container_name: yt-web
     networks:
       - yt-network
-      - proxy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.yt-web.rule=Host(`yt.sonbn.xyz`)"
-      - "traefik.http.routers.yt-web.entrypoints=websecure"
-      - "traefik.http.routers.yt-web.tls.certresolver=le"
-      - "traefik.http.services.yt-web.loadbalancer.server.port=80"
-      - "traefik.http.routers.yt-web.priority=10"
     expose:
       - "80"
 

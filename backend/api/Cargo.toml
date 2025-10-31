@@ -3,16 +3,7 @@ name = "youtube-tunnel-api"
 version = "0.1.0"
 edition = "2024"
 
-
-[workspace]
-members = [".", "service", "shared", "web"]
-
 [dependencies]
-web = { path = "web" }
-actix-web = "4.11.0"
-
-
-[workspace.dependencies]
 # Core
 log = "0.4.28"
 tracing = "0.1.41"

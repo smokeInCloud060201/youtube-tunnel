@@ -35,6 +35,14 @@ service-down:
 common-down:
 	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/base-docker-compose.yml down || true
 
+deploy-common-local:
+	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/base-docker-compose.local.yml up -d
+
+deploy-service-local:
+	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.local.yml up -d
+
+deploy-local: deploy-common-local deploy-service-local
+
 clean-app-images:
 	$(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.yml down --rmi all -v --remove-orphans || true
 	$(DOCKER_BIN) rmi -f youtube-tunnel-api:latest youtube-tunnel-worker:latest youtube-tunnel-web:latest || true

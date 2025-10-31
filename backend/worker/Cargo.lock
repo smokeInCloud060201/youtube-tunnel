@@ -2427,19 +2427,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "service"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "aws-sdk-s3",
- "deadpool-redis",
- "serde_json",
- "shared",
- "tokio",
- "tracing",
-]
-
-[[package]]
 name = "sha1"
 version = "0.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2468,23 +2455,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f40ca3c46823713e0d4209592e8d6e826aa57e928f09752619fc696c499637f6"
 dependencies = [
  "lazy_static",
-]
-
-[[package]]
-name = "shared"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "anyhow",
- "aws-config",
- "aws-sdk-s3",
- "deadpool-redis",
- "log",
- "serde",
- "thiserror",
- "tokio",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]
@@ -2975,23 +2945,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "web"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "deadpool-redis",
- "dotenvy",
- "listenfd",
- "log",
- "serde",
- "service",
- "shared",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "winapi"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3222,7 +3175,19 @@ name = "youtube-tunnel-worker"
 version = "0.1.0"
 dependencies = [
  "actix-web",
- "web",
+ "anyhow",
+ "aws-config",
+ "aws-sdk-s3",
+ "deadpool-redis",
+ "dotenvy",
+ "listenfd",
+ "log",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
