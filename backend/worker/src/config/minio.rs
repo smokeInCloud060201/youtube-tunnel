@@ -37,8 +37,8 @@ pub async fn init() -> anyhow::Result<Client> {
 
     let client =  Client::from_conf(config);
 
-    init_bucket(&client, String::from("videos")).await?;
-    init_bucket(&client, String::from("credential")).await?;
+    init_bucket(&client, String::from("yt-videos")).await?;
+    init_bucket(&client, String::from("yt-credential")).await?;
 
     Ok(client)
 }

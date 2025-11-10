@@ -12,7 +12,7 @@ impl YoutubeCookie {
     }
 
     pub async fn get_cookie_data(&self) -> anyhow::Result<Vec<u8>> {
-        let bucket_name = "credential";
+        let bucket_name = "yt-credential";
         let cookie_key = "cookie.txt";
 
         let list_resp = self

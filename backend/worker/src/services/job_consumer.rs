@@ -48,11 +48,6 @@ impl JobConsumer {
         Ok(())
     }
 
-    pub async fn stop(&self) {
-        self.running.store(false, Ordering::SeqCst);
-        info!(" Stopping VideoJobConsumer workers...");
-    }
-
     async fn run_loop(&self) -> anyhow::Result<()> {
         let mut conn = self.redis_pool.get().await?;
         while self.running.load(Ordering::SeqCst) {
@@ -79,7 +74,7 @@ impl JobConsumer {
     async fn handle_job(&self, job: VideoJob) -> anyhow::Result<()> {
         if job.job_id.is_empty()
             || self
-                .object_exists("videos", &format!("{}/playlist.m3u8", job.job_id))
+                .object_exists("yt-videos", &format!("{}/playlist.m3u8", job.job_id))
                 .await
         {
             info!("Job is invalid or already exists: {}", job.job_id);
@@ -108,7 +103,7 @@ impl JobConsumer {
     async fn set_job_status(&self, job_id: &str, status: &str) -> anyhow::Result<()> {
         let mut redis_conn = self.redis_pool.get().await?;
         let status_key = format!("job:{}:status", job_id);
-        let _: () = redis_conn.set_ex::<_, _, ()>(&status_key, status, 86400).await?;
+        let _: () = redis_conn.set_ex::<_, _, ()>(&status_key, status, 3600).await?;
         Ok(())
     }
 
@@ -116,7 +111,7 @@ impl JobConsumer {
         let mut redis_conn = self.redis_pool.get().await?;
         let progress_key = format!("job:{}:progress", job_id);
         let _: () = redis_conn
-            .set_ex::<_, _, ()>(&progress_key, progress.to_string(), 86400)
+            .set_ex::<_, _, ()>(&progress_key, progress.to_string(), 3600)
             .await?;
         Ok(())
     }
@@ -132,7 +127,7 @@ impl JobConsumer {
     }
 
     async fn consume_data(&self, job: &VideoJob) -> anyhow::Result<()> {
-        let bucket_name = "videos";
+        let bucket_name = "yt-videos";
         let job_id = &job.job_id;
         let youtube_url = &job.video_url;
 
@@ -435,7 +430,7 @@ async fn set_job_progress_internal(redis_pool: &Pool, job_id: &str, progress: f6
     let mut redis_conn = redis_pool.get().await?;
     let progress_key = format!("job:{}:progress", job_id);
     let _: () = redis_conn
-        .set_ex::<_, _, ()>(&progress_key, progress.to_string(), 86400)
+        .set_ex::<_, _, ()>(&progress_key, progress.to_string(), 3600)
         .await?;
     Ok(())
 }

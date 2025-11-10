@@ -26,7 +26,7 @@ impl VideoPlayer {
         let job_id = get_job_id(&source_url)?;
 
         // Check if video already exists
-        let bucket_name = "videos";
+        let bucket_name = "yt-videos";
         let playlist_object = format!("{job_id}/playlist.m3u8");
         
         let video_exists = self
@@ -70,7 +70,7 @@ impl VideoPlayer {
     }
 
     pub async fn get_playlist(&self, job_id: String) -> anyhow::Result<String> {
-        let bucket_name = "videos";
+        let bucket_name = "yt-videos";
         let playlist_object = format!("{job_id}/playlist.m3u8");
 
         self.minio
@@ -127,7 +127,7 @@ impl VideoPlayer {
 
     pub async fn get_job_status(&self, job_id: &str) -> anyhow::Result<JobStatusResponse> {
         // Check if video exists first
-        let bucket_name = "videos";
+        let bucket_name = "yt-videos";
         let playlist_object = format!("{job_id}/playlist.m3u8");
         
         let video_exists = self
