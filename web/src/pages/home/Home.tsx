@@ -4,7 +4,11 @@ import VideoPlayer from "@/components/video/VideoPlayer.tsx";
 import { useEffect, useState, useCallback } from "react";
 import type { VideoPlayerResponse } from "@/types/video.type.ts";
 
-const Home: React.FC = () => {
+interface HomeProps {
+  isAudio?: boolean;
+}
+
+const Home: React.FC<HomeProps> = ({ isAudio = false }) => {
   const { id } = useParams<{ id: string }>();
   const [jobId, setJobId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +20,7 @@ const Home: React.FC = () => {
     setJobId(null);
 
     try {
-      const data: VideoPlayerResponse = await loadVideo(videoId);
+      const data: VideoPlayerResponse = await loadVideo(videoId, isAudio);
       setJobId(data.jobId);
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to load video');
@@ -25,7 +29,7 @@ const Home: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAudio]);
 
   useEffect(() => {
     if (id) {
@@ -41,7 +45,7 @@ const Home: React.FC = () => {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4" />
-          <p className="text-lg">Loading video...</p>
+          <p className="text-lg">Loading {isAudio ? 'audio' : 'video'}...</p>
         </div>
       </div>
     );
@@ -81,7 +85,7 @@ const Home: React.FC = () => {
 
   return (
     <div>
-      <VideoPlayer jobId={jobId} />
+      <VideoPlayer jobId={jobId} isAudio={isAudio} />
     </div>
   );
 };
