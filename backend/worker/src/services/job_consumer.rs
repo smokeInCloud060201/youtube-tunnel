@@ -148,13 +148,16 @@ impl JobConsumer {
         info!("Got cookie: {}", &cookie_path.to_string_lossy());
         info!("Processing job {} (is_audio: {})", job_id, job.is_audio);
 
+        // Convert cookie path to String to avoid temporary value issues
+        let cookie_path_str = cookie_path.to_string_lossy().to_string();
+
         // yt-dlp -> ffmpeg pipeline
         let yt_dlp_args = if job.is_audio {
             // Audio-only download
             vec![
                 "--no-playlist",
                 "--cookies",
-                &cookie_path.to_string_lossy(),
+                &cookie_path_str,
                 "-f",
                 "ba/b",
                 "-o",
@@ -166,7 +169,7 @@ impl JobConsumer {
             vec![
                 "--no-playlist",
                 "--cookies",
-                &cookie_path.to_string_lossy(),
+                &cookie_path_str,
                 "-f",
                 "bv*[vcodec^=avc1]+ba/b",
                 "-o",
