@@ -1,5 +1,5 @@
 use crate::handlers::video::{clean_storage, upload_cookie};
-use crate::handlers::video_player::{get_video_playlist, request_video, get_video_status};
+use crate::handlers::video_player::{get_video_playlist, request_video, get_video_status, clean_job, clean_all_jobs};
 use crate::handlers::video_search::get_video;
 use actix_cors::Cors;
 use actix_web::middleware;
@@ -84,6 +84,7 @@ pub async fn start() -> std::io::Result<()> {
             .app_data(web::Data::new(Arc::new(video_search.clone())))
             .app_data(web::Data::new(video.clone()))
             .app_data(web::Data::new(Arc::new(video_player.clone())))
+            .app_data(web::Data::new(Arc::new(video_job_producer.clone())))
             .configure(init_config)
     });
 
@@ -104,6 +105,8 @@ fn init_config(cfg: &mut web::ServiceConfig) {
         .service(clean_storage)
         .service(upload_cookie)
         .service(get_video_playlist)
-        .service(get_video_status);
+        .service(get_video_status)
+        .service(clean_job)
+        .service(clean_all_jobs);
 }
 

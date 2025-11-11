@@ -126,5 +126,70 @@ impl VideoJobProducer {
 
         Ok(true)
     }
+
+    /// Clean a specific job's data from Redis
+    pub async fn clean_job(&self, job_id: &str) -> anyhow::Result<usize> {
+        let mut redis_conn = self.redis_pool.get().await?;
+        let mut deleted = 0;
+
+        // Delete job status
+        let status_key = format!("job:{}:status", job_id);
+        if redis_conn.del::<_, i32>(&status_key).await? > 0 {
+            deleted += 1;
+        }
+
+        // Delete job progress
+        let progress_key = format!("job:{}:progress", job_id);
+        if redis_conn.del::<_, i32>(&progress_key).await? > 0 {
+            deleted += 1;
+        }
+
+        // Delete queue marker
+        let queue_key = format!("job:{}:queued", job_id);
+        if redis_conn.del::<_, i32>(&queue_key).await? > 0 {
+            deleted += 1;
+        }
+
+        // Remove from queue if present
+        let queue_items: Vec<String> = redis_conn.lrange::<_, Vec<String>>("job-queue", 0, -1).await?;
+        for item in queue_items.iter() {
+            match serde_json::from_str::<VideoJob>(item) {
+                Ok(queued_job) if queued_job.job_id == job_id => {
+                    redis_conn.lrem::<_, _, i32>("job-queue", 1, item).await?;
+                    deleted += 1;
+                    break;
+                }
+                _ => {}
+            }
+        }
+
+        info!("Cleaned job {}: {} keys deleted", job_id, deleted);
+        Ok(deleted)
+    }
+
+    /// Clean all job-related keys from Redis
+    pub async fn clean_all_jobs(&self) -> anyhow::Result<usize> {
+        let mut redis_conn = self.redis_pool.get().await?;
+        let mut deleted = 0;
+
+        // Get all job:* keys
+        let pattern = "job:*";
+        let keys: Vec<String> = redis_conn.keys::<_, Vec<String>>(pattern).await?;
+        
+        if !keys.is_empty() {
+            let count = redis_conn.del::<_, i32>(keys).await?;
+            deleted += count as usize;
+        }
+
+        // Clear the job queue
+        let queue_length: i32 = redis_conn.llen::<_, i32>("job-queue").await?;
+        if queue_length > 0 {
+            redis_conn.del::<_, i32>("job-queue").await?;
+            deleted += queue_length as usize;
+        }
+
+        info!("Cleaned all jobs: {} keys deleted", deleted);
+        Ok(deleted)
+    }
 }
 

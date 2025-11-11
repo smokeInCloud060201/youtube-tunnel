@@ -1,8 +1,10 @@
 use actix_web::get;
 use actix_web::post;
+use actix_web::delete;
 use actix_web::web;
 use actix_web::HttpResponse;
 use crate::services::video_player::VideoPlayer;
+use crate::services::video_job_producer::VideoJobProducer;
 use crate::model::video_player::{QueryParams, VideoPlayerResponse, JobStatusResponse};
 use std::sync::Arc;
 use tracing::info;
@@ -79,5 +81,58 @@ async fn get_video_status(
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .json(response))
+}
+
+#[delete("/v1/video-player/jobs/{job_id}")]
+pub async fn clean_job(
+    job_id: web::Path<String>,
+    producer: web::Data<Arc<VideoJobProducer>>,
+) -> actix_web::Result<HttpResponse> {
+    info!("Cleaning job: {}", job_id);
+    
+    match producer.clean_job(&job_id).await {
+        Ok(deleted_count) => {
+            Ok(HttpResponse::Ok()
+                .content_type("application/json")
+                .json(serde_json::json!({
+                    "message": format!("Job {} cleaned successfully", job_id),
+                    "deleted_keys": deleted_count
+                })))
+        }
+        Err(e) => {
+            tracing::error!("Failed to clean job {}: {}", job_id, e);
+            Ok(HttpResponse::InternalServerError()
+                .content_type("application/json")
+                .json(serde_json::json!({
+                    "error": format!("Failed to clean job: {}", e)
+                })))
+        }
+    }
+}
+
+#[delete("/v1/video-player/jobs")]
+pub async fn clean_all_jobs(
+    producer: web::Data<Arc<VideoJobProducer>>,
+) -> actix_web::Result<HttpResponse> {
+    info!("Cleaning all jobs");
+    
+    match producer.clean_all_jobs().await {
+        Ok(deleted_count) => {
+            Ok(HttpResponse::Ok()
+                .content_type("application/json")
+                .json(serde_json::json!({
+                    "message": "All jobs cleaned successfully",
+                    "deleted_keys": deleted_count
+                })))
+        }
+        Err(e) => {
+            tracing::error!("Failed to clean all jobs: {}", e);
+            Ok(HttpResponse::InternalServerError()
+                .content_type("application/json")
+                .json(serde_json::json!({
+                    "error": format!("Failed to clean all jobs: {}", e)
+                })))
+        }
+    }
 }
 
