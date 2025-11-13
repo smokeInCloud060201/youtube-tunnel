@@ -48,6 +48,11 @@ impl JobConsumer {
         Ok(())
     }
 
+    pub async fn stop(&self) {
+        self.running.store(false, Ordering::SeqCst);
+        info!(" Stopping VideoJobConsumer workers...");
+    }
+
     async fn run_loop(&self) -> anyhow::Result<()> {
         let mut conn = self.redis_pool.get().await?;
         while self.running.load(Ordering::SeqCst) {
@@ -141,75 +146,25 @@ impl JobConsumer {
         fs::write(&cookie_path, &cookie_data).await?;
 
         info!("Got cookie: {}", &cookie_path.to_string_lossy());
-        info!("Processing job {} (is_audio: {})", job_id, job.is_audio);
-
-        // Convert cookie path to String to avoid temporary value issues
-        let cookie_path_str = cookie_path.to_string_lossy().to_string();
 
         // yt-dlp -> ffmpeg pipeline
-        let yt_dlp_args = if job.is_audio {
-            // Audio-only download
-            vec![
+        let mut yt_process = Command::new("yt-dlp")
+            .args([
                 "--no-playlist",
                 "--cookies",
-                &cookie_path_str,
-                "-f",
-                "ba/b",
-                "-o",
-                "-",
-                youtube_url,
-            ]
-        } else {
-            // Video + audio download
-            vec![
-                "--no-playlist",
-                "--cookies",
-                &cookie_path_str,
+                &cookie_path.to_string_lossy(),
                 "-f",
                 "bv*[vcodec^=avc1]+ba/b",
                 "-o",
                 "-",
                 youtube_url,
-            ]
-        };
-
-        let mut yt_process = Command::new("yt-dlp")
-            .args(yt_dlp_args)
+            ])
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
             .spawn()?;
 
-        let ffmpeg_args = if job.is_audio {
-            // Audio-only HLS
-            vec![
-                "-i",
-                "pipe:0",
-                "-vn", // Disable video
-                "-c:a",
-                "aac",
-                "-b:a",
-                "128k",
-                "-ac",
-                "2",
-                "-ar",
-                "44100",
-                "-af",
-                "aresample=async=1",
-                "-hls_time",
-                "6",
-                "-hls_list_size",
-                "0",
-                "-hls_flags",
-                "independent_segments+append_list",
-                "-start_number",
-                "0",
-                "-f",
-                "hls",
-                playlist_path.to_str().unwrap(),
-            ]
-        } else {
-            // Video + audio HLS
-            vec![
+        let mut ff_process = Command::new("ffmpeg")
+            .args([
                 "-i",
                 "pipe:0",
                 "-c:v",
@@ -245,11 +200,7 @@ impl JobConsumer {
                 "-f",
                 "hls",
                 playlist_path.to_str().unwrap(),
-            ]
-        };
-
-        let mut ff_process = Command::new("ffmpeg")
-            .args(ffmpeg_args)
+            ])
             .stdin(Stdio::piped())
             .stderr(Stdio::inherit())
             .current_dir(&work_dir)

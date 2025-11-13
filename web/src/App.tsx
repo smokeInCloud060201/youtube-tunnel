@@ -35,14 +35,6 @@ const App: React.FC = () => {
         }
       />
       <Route
-        path="/audio/:id"
-        element={
-          <BaseLayout>
-            <Home isAudio={true} />
-          </BaseLayout>
-        }
-      />
-      <Route
         path="/search"
         element={
           <BaseLayout>

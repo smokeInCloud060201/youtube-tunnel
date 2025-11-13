@@ -4,8 +4,6 @@ use serde::{Deserialize, Serialize};
 pub struct QueryParams {
     #[serde(rename = "youtubeUrl")]
     pub youtube_url: String,
-    #[serde(rename = "isAudio", default)]
-    pub is_audio: bool,
 }
 
 #[derive(Serialize, Debug)]
@@ -23,9 +21,6 @@ pub struct VideoJob {
 
     #[serde(rename = "videoUrl")]
     pub video_url: String,
-
-    #[serde(rename = "isAudio", default)]
-    pub is_audio: bool,
 }
 
 #[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq)]

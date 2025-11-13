@@ -41,7 +41,7 @@ deploy-common-local:
 deploy-service-local:
 	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.local.yml up -d
 
-deploy-local: build-api-image build-worker-image build-web-image deploy-common-local deploy-service-local
+deploy-local: deploy-common-local deploy-service-local
 
 clean-app-images:
 	$(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.yml down --rmi all -v --remove-orphans || true

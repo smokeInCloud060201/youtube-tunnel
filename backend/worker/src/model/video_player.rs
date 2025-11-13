@@ -7,8 +7,5 @@ pub struct VideoJob {
 
     #[serde(rename = "videoUrl")]
     pub video_url: String,
-
-    #[serde(rename = "isAudio", default)]
-    pub is_audio: bool,
 }
 

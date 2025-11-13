@@ -4,10 +4,9 @@ import { URL_BASE_HOST } from "@/utils/app.config.ts";
 
 export interface VideoPlayerProps {
   jobId: string;
-  isAudio?: boolean;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = React.memo(({ jobId, isAudio = false }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = React.memo(({ jobId }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
 
@@ -15,7 +14,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = React.memo(({ jobId, isAudio = f
     const video = videoRef.current;
     if (!video) return;
 
-    video.muted = !isAudio; // Unmute for audio-only mode
+    video.muted = true;
     video.playsInline = true;
 
     if (Hls.isSupported()) {
@@ -65,7 +64,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = React.memo(({ jobId, isAudio = f
         hlsRef.current = null;
       }
     };
-  }, [jobId, isAudio]);
+  }, [jobId]);
 
   return (
     <video
@@ -73,13 +72,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = React.memo(({ jobId, isAudio = f
       controls
       autoPlay
       playsInline
-      muted={!isAudio}
-      style={{
-        height: isAudio ? "auto" : "calc(100vh - 120px)",
-        width: "100%",
-        margin: "0 24px",
-        maxHeight: isAudio ? "200px" : undefined,
-      }}
+      muted
+      style={{ height: "calc(100vh - 120px)", width: "100%", margin: "0 24px" }}
       className="rounded-lg shadow-lg"
     />
   );

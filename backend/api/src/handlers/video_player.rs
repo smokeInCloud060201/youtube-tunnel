@@ -14,15 +14,13 @@ async fn request_video(
     params: web::Query<QueryParams>,
     service: web::Data<Arc<VideoPlayer>>,
 ) -> actix_web::Result<HttpResponse> {
-    let params = params.into_inner();
-    let source = params.youtube_url;
-    let is_audio = params.is_audio;
+    let source = params.into_inner().youtube_url;
 
-    info!("Processing video {} (is_audio: {})", &source, is_audio);
+    info!("Processing video {}", &source);
 
     let job_id = service
         .as_ref()
-        .submit_video_job(source, is_audio)
+        .submit_video_job(source)
         .await
         .expect("Failed to submit video job");
 

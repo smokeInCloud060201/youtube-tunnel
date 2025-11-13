@@ -1,11 +1,10 @@
 import { baseApi } from "@/services/api.base.ts";
 import type { VideoPlayerResponse, JobStatusResponse } from "@/types/video.type.ts";
 
-const loadVideo = async (videoId: string, isAudio: boolean = false): Promise<VideoPlayerResponse> => {
+const loadVideo = async (videoId: string): Promise<VideoPlayerResponse> => {
   const videoSource = `https://www.youtube.com/watch?v=${videoId}`;
-  const isAudioParam = isAudio ? '&isAudio=true' : '';
   const response = await baseApi.post<VideoPlayerResponse>(
-    `/v1/video-player?youtubeUrl=${encodeURIComponent(videoSource)}${isAudioParam}`
+    `/v1/video-player?youtubeUrl=${encodeURIComponent(videoSource)}`
   );
   return response.data;
 };

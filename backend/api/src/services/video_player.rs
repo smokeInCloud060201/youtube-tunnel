@@ -22,7 +22,7 @@ impl VideoPlayer {
         }
     }
 
-    pub async fn submit_video_job(&self, source_url: String, is_audio: bool) -> anyhow::Result<String> {
+    pub async fn submit_video_job(&self, source_url: String) -> anyhow::Result<String> {
         let job_id = get_job_id(&source_url)?;
 
         // Check if video already exists
@@ -56,7 +56,6 @@ impl VideoPlayer {
                 VideoJob {
                     job_id: job_id.clone(),
                     video_url: source_url,
-                    is_audio,
                 },
                 false,
             )
