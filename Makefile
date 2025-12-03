@@ -20,9 +20,6 @@ build-web-image:
 	$(DOCKER_BIN) rmi -f youtube-tunnel-web:${IMAGE_TAG} || true
 	$(DOCKER_BIN) build -f $(DOCKER_BASE_PATH)/web.Dockerfile -t youtube-tunnel-web:${IMAGE_TAG} ./web
 
-deploy-common:
-	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/base-docker-compose.yml up -d
-
 deploy-service:
 	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.yml up -d --build
 
@@ -32,16 +29,10 @@ create-network:
 service-down:
 	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.yml down || true
 
-common-down:
-	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/base-docker-compose.yml down || true
-
-deploy-common-local:
-	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/base-docker-compose.local.yml up -d
-
 deploy-service-local:
 	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.local.yml up -d
 
-deploy-local: deploy-common-local deploy-service-local
+deploy-local: deploy-service-local
 
 clean-app-images:
 	$(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.yml down --rmi all -v --remove-orphans || true

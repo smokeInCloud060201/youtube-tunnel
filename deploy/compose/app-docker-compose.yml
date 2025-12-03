@@ -7,6 +7,7 @@ services:
     networks:
       - yt-network
       - proxy
+      - sunflower_data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.yt-api.rule=Host(`yt.sonbn.xyz`) && PathPrefix(`/api`)"
@@ -23,10 +24,10 @@ services:
       YOUTUBE_HOST: ${YOUTUBE_BASE_HOST}
       REDIS_HOST: yt-redis
       REDIS_PORT: "6379"
-      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
-      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
       AWS_REGION: us-east-1
-      MINIO_ENDPOINT: ${MINIO_EXTERNAL_URL}
+      MINIO_ENDPOINT: ${MINIO_API_DOMAIN}
     expose:
       - "8080"
 
@@ -38,12 +39,13 @@ services:
       SERVER_PORT: 8081
       REDIS_HOST: yt-redis
       REDIS_PORT: "6379"
-      AWS_ACCESS_KEY_ID: ${MINIO_USERNAME}
-      AWS_SECRET_ACCESS_KEY: ${MINIO_PASSWORD}
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
       AWS_REGION: us-east-1
-      MINIO_ENDPOINT: ${MINIO_INTERNAL_URL}
+      MINIO_ENDPOINT: ${CONTAINER_NAME}:9000
     networks:
       - yt-network
+      - sunflower_data
     expose:
       - "8081"
 
@@ -53,6 +55,7 @@ services:
     networks:
       - yt-network
       - proxy
+      - sunflower_data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.yt-web.rule=Host(`yt.sonbn.xyz`)"
@@ -67,4 +70,6 @@ networks:
   yt-network:
     external: true
   proxy:
+    external: true
+  sunflower_data:
     external: true
