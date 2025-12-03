@@ -39,5 +39,5 @@ clean-app-images:
 	$(DOCKER_BIN) rmi -f youtube-tunnel-api:latest youtube-tunnel-worker:latest youtube-tunnel-web:latest || true
 
 
-deploy: create-network common-down deploy-common service-down deploy-service
+deploy: create-network service-down deploy-service
 
