@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_TAG  = "${env.BUILD_NUMBER}"
+        IMAGE_TAG  = "latest"
 
         DOCKER_BIN = "docker"
-        DOCKER_COMPOSE_BIN = "docker compose"
+        DOCKER_COMPOSE_BIN = "docker-compose"
         DOCKER_BASE_PATH = "./deploy/docker"
         DOCKER_COMPOSE_BASE_PATH = "./deploy/compose"
         DOCKER_NETWORK_NAME = "yt-network"
