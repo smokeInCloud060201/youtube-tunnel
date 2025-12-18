@@ -37,7 +37,7 @@ pipeline {
             steps {
                 sh '''
                     ${DOCKER_COMPOSE_BIN} -f ${DOCKER_COMPOSE_BASE_PATH}/app-docker-compose.yml down --rmi all -v --remove-orphans || true
-                    ${DOCKER_BIN} rmi -f youtube-tunnel-api:latest youtube-tunnel-worker:latest youtube-tunnel-web:latest || true
+                    ${DOCKER_BIN} rmi -f youtube-tunnel-api:${IMAGE_TAG} youtube-tunnel-worker:${IMAGE_TAG} youtube-tunnel-web:${IMAGE_TAG} || true
                 '''
             }
         }
