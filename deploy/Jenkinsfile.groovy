@@ -24,6 +24,11 @@ pipeline {
 
         DATA_NETWORK    = credentials('DATA_NETWORK')
         TRAEFIK_NETWORK = credentials('TRAEFIK_NETWORK')
+
+        REDIS_HOSTNAME   = credentials('REDIS_CONTAINER_NAME')
+        REDIS_PORT       = credentials('REDIS_PORT')
+        REDIS_USERNAME   = credentials('REDIS_USERNAME')
+        REDIS_PASSWORD   = credentials('REDIS_PASSWORD')
     }
 
     stages {
@@ -91,6 +96,10 @@ pipeline {
                     MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
                     DATA_NETWORK=${DATA_NETWORK}
                     TRAEFIK_NETWORK=${TRAEFIK_NETWORK}
+                    REDIS_HOSTNAME=${REDIS_HOSTNAME}
+                    REDIS_PORT=${REDIS_PORT}
+                    REDIS_USERNAME=${REDIS_USERNAME}
+                    REDIS_PASSWORD=${REDIS_PASSWORD}
                     EOF
                 '''
 
