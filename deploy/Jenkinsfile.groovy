@@ -21,6 +21,9 @@ pipeline {
         MINIO_API_DOMAIN = credentials("MINIO_API_DOMAIN")
         MINIO_ROOT_USER = credentials("MINIO_ROOT_USER")
         MINIO_ROOT_PASSWORD = credentials("MINIO_ROOT_PASSWORD")
+
+        DATA_NETWORK    = credentials('DATA_NETWORK')
+        TRAEFIK_NETWORK = credentials('TRAEFIK_NETWORK')
     }
 
     stages {
@@ -86,6 +89,8 @@ pipeline {
                     MINIO_API_DOMAIN=${MINIO_API_DOMAIN}
                     MINIO_ROOT_USER=${MINIO_ROOT_USER}
                     MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+                    DATA_NETWORK=${DATA_NETWORK}
+                    TRAEFIK_NETWORK=${TRAEFIK_NETWORK}
                     EOF
                 '''
 

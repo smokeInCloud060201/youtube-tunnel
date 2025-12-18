@@ -6,7 +6,7 @@ services:
     container_name: yt-api
     networks:
       - yt-network
-      - proxy
+      - proxy_network
       - sunflower_data
     labels:
       - "traefik.enable=true"
@@ -54,7 +54,7 @@ services:
     container_name: yt-web
     networks:
       - yt-network
-      - proxy
+      - proxy_network
       - sunflower_data
     labels:
       - "traefik.enable=true"
@@ -69,7 +69,9 @@ services:
 networks:
   yt-network:
     external: true
-  proxy:
+  proxy_network:
+    name: ${TRAEFIK_NETWORK}
     external: true
   sunflower_data:
+    name: ${DATA_NETWORK}
     external: true
