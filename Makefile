@@ -32,6 +32,10 @@ service-down:
 deploy-service-local:
 	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/app-docker-compose.local.yml up -d
 
+deploy-common-local:
+	 $(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_BASE_PATH)/base-docker-compose.local.yml up -d
+
+
 deploy-local: deploy-service-local
 
 clean-app-images:
