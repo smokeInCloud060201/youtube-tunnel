@@ -26,5 +26,6 @@ thiserror = "2.0.17"
 dotenvy = "0.15.7"
 listenfd = "1.0.2"
 deadpool-redis = { version = "0.22.0", features = ["rt_tokio_1", "serde"] }
+percent-encoding = "2.3"
 
 serde_json = "1.0.145"
