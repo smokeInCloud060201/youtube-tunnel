@@ -3936,6 +3936,7 @@ dependencies = [
  "futures-util",
  "listenfd",
  "log",
+ "percent-encoding",
  "reqwest",
  "serde",
  "serde_json",

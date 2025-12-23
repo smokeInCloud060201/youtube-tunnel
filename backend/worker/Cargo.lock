@@ -3182,6 +3182,7 @@ dependencies = [
  "dotenvy",
  "listenfd",
  "log",
+ "percent-encoding",
  "serde",
  "serde_json",
  "thiserror",
