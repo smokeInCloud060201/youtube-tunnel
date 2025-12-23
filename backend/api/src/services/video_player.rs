@@ -1,5 +1,5 @@
 use crate::services::video_job_producer::VideoJobProducer;
-use crate::model::video_player::{JobStatus, JobStatusResponse};
+use crate::model::video_player::JobStatusResponse;
 use anyhow::{anyhow, bail};
 use aws_sdk_s3::presigning::PresigningConfig;
 use aws_sdk_s3::Client;

@@ -78,7 +78,12 @@ pub async fn start() -> std::io::Result<()> {
             .allow_any_origin()
             .allow_any_header();
 
+        // Configure payload size limits (10MB should be enough for cookie files)
+        let payload_config = web::PayloadConfig::default()
+            .limit(10 * 1024 * 1024); // 10MB
+
         App::new()
+            .app_data(payload_config)
             .wrap(middleware::Logger::default())
             .wrap(cors)
             .app_data(web::Data::new(Arc::new(video_search.clone())))

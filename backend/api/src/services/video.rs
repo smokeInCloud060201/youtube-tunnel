@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use aws_sdk_s3::types::ObjectIdentifier;
 use aws_sdk_s3::Client;
 use std::path::Path;
@@ -134,18 +135,34 @@ impl Video {
 
     pub async fn save_cookie(&self, cookie_file_path: &Path) -> anyhow::Result<()> {
         let bucket_name = "yt-credential";
+        let cookie_key = "cookie.txt";
 
         let contents = fs::read(cookie_file_path).await?;
+        
+        if contents.is_empty() {
+            return Err(anyhow!("Cookie file is empty"));
+        }
 
+        info!(
+            "Uploading cookie file to MinIO: bucket={}, key={}, size={} bytes",
+            bucket_name,
+            cookie_key,
+            contents.len()
+        );
+
+        // put_object will overwrite existing object with the same key
         self.minio
             .put_object()
             .bucket(bucket_name)
-            .key("cookie.txt")
+            .key(cookie_key)
             .body(contents.into())
             .send()
             .await?;
 
-        info!("Uploaded cookie.txt to MinIO bucket `{}`", bucket_name);
+        info!(
+            "Successfully uploaded cookie.txt to MinIO bucket `{}` (overwrote existing file if present)",
+            bucket_name
+        );
         Ok(())
     }
 
