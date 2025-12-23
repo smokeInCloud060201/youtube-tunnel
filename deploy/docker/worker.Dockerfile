@@ -1,7 +1,7 @@
 ARG RUST_VERSION=1.90.0
 ARG APP_NAME=youtube-tunnel-worker
 ARG FFMPEG_VERSION=6.1
-ARG YT_DLP_VERSION=2025.11.12
+ARG YT_DLP_VERSION=2025.09.26
 
 FROM rust:${RUST_VERSION}-alpine AS build
 ARG APP_NAME
@@ -44,7 +44,7 @@ RUN tar xzf ffmpeg-$FFMPEG_VERSION.tar.gz && \
 FROM alpine:3.18 AS final
 WORKDIR /app
 
-ARG YT_DLP_VERSION=2025.11.12
+ARG YT_DLP_VERSION=2025.10.22
 
 RUN apk add --no-cache \
     python3 py3-pip libstdc++ libssl3 ca-certificates \
