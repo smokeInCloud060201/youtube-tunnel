@@ -1,7 +1,7 @@
 use actix_multipart::Multipart;
 use actix_web::{post, web, HttpResponse};
 use futures_util::{StreamExt, TryStreamExt};
-use crate::services::video::Video;
+use crate::management::service::Video;
 use std::sync::Arc;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;

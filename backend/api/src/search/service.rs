@@ -3,8 +3,8 @@ use base64::Engine;
 use futures::future::join_all;
 use futures::join;
 use reqwest::Client;
-use crate::model::video_search::{
-    QueryParams, SearchVideoResponseResult, Thumbnail, Thumbnails, VideoSearchResult,
+use shared::models::video_search::{
+    QueryParams, SearchVideoResponseResult, VideoSearchResult, Thumbnail, Thumbnails,
 };
 
 #[derive(Clone)]

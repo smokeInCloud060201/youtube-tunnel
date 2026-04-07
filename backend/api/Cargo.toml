@@ -36,3 +36,4 @@ actix-multipart = "0.7.2"
 futures-util = "0.3.31"
 actix-cors = "0.7.1"
 tokio-cron-scheduler = "0.15.0"
+shared = { version = "0.1.0", path = "../shared" }

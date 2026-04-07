@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "api",
+    "worker",
+    "shared"
+]
+resolver = "2"

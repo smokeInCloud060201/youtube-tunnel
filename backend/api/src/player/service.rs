@@ -1,12 +1,14 @@
-use crate::services::video_job_producer::VideoJobProducer;
-use crate::model::video_player::JobStatusResponse;
-use anyhow::{anyhow, bail};
-use aws_sdk_s3::presigning::PresigningConfig;
-use aws_sdk_s3::Client;
-use reqwest::Url;
-use crate::model::video_player::VideoJob;
+use crate::player::producer::VideoJobProducer;
+use shared::models::video_player::JobStatusResponse;
+use actix_web::HttpResponse;
+use aws_sdk_s3::{presigning::PresigningConfig, Client};
+use std::env;
+use std::sync::Arc;
+use shared::models::video_player::VideoJob;
 use std::time::Duration;
 use tracing::{error, info};
+use anyhow::{anyhow, bail};
+use reqwest::Url;
 
 #[derive(Clone)]
 pub struct VideoPlayer {

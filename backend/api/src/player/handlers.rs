@@ -3,9 +3,9 @@ use actix_web::post;
 use actix_web::delete;
 use actix_web::web;
 use actix_web::HttpResponse;
-use crate::services::video_player::VideoPlayer;
-use crate::services::video_job_producer::VideoJobProducer;
-use crate::model::video_player::{QueryParams, VideoPlayerResponse, JobStatusResponse};
+use crate::player::service::VideoPlayer;
+use crate::player::producer::VideoJobProducer;
+use shared::models::video_player::{QueryParams, VideoPlayerResponse, JobStatusResponse};
 use std::sync::Arc;
 use tracing::info;
 

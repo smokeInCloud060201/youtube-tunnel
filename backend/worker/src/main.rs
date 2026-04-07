@@ -1,9 +1,8 @@
-mod config;
-mod model;
-mod services;
+mod pipeline;
 mod server;
+mod youtube;
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()> {
     server::start().await
 }

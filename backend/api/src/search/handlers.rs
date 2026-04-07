@@ -1,6 +1,6 @@
 use actix_web::{get, web, HttpResponse};
-use crate::services::video_search::VideoSearchService;
-use crate::model::video_search;
+use crate::search::service::VideoSearchService;
+use shared::models::video_search;
 use std::sync::Arc;
 use tracing::debug;
 

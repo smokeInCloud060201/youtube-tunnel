@@ -11,10 +11,10 @@ RUN apk add --no-cache clang lld musl-dev git pkgconfig openssl-dev openssl-libs
 ENV OPENSSL_STATIC=1
 
 COPY Cargo.toml Cargo.lock ./
+COPY api api
+COPY shared shared
 
-COPY src src
-
-RUN cargo build --locked --release && \
+RUN cargo build -p youtube-tunnel-api --locked --release && \
 cp ./target/release/$APP_NAME /bin/server
 
 ################################################################################

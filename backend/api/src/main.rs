@@ -1,8 +1,6 @@
-mod config;
-mod errors;
-mod model;
-mod services;
-mod handlers;
+mod management;
+mod player;
+mod search;
 mod server;
 
 #[actix_web::main]

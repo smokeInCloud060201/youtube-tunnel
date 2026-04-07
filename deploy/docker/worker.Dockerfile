@@ -11,9 +11,10 @@ RUN apk add --no-cache clang lld musl-dev git pkgconfig openssl-dev openssl-libs
 ENV OPENSSL_STATIC=1
 
 COPY Cargo.toml Cargo.lock ./
-COPY src src
+COPY worker worker
+COPY shared shared
 
-RUN cargo build --locked --release && cp ./target/release/$APP_NAME /bin/server
+RUN cargo build -p youtube-tunnel-worker --locked --release && cp ./target/release/$APP_NAME /bin/server
 
 FROM alpine:3.18 AS ffmpeg-build
 ARG FFMPEG_VERSION

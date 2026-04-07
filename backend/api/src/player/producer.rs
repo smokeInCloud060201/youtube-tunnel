@@ -1,6 +1,6 @@
 use deadpool_redis::redis::AsyncCommands;
 use deadpool_redis::Pool;
-use crate::model::video_player::{JobStatus, VideoJob};
+use shared::models::video_player::{JobStatus, VideoJob};
 use tracing::{info, warn};
 
 #[derive(Clone)]

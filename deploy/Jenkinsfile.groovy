@@ -52,7 +52,7 @@ pipeline {
                             ${DOCKER_BIN} build \
                                 -f ${DOCKER_BASE_PATH}/api.Dockerfile \
                                 -t youtube-tunnel-api:${IMAGE_TAG} \
-                                ./backend/api
+                                ./backend
                         '''
                     }
                 }
@@ -64,7 +64,7 @@ pipeline {
                             ${DOCKER_BIN} build \
                                 -f ${DOCKER_BASE_PATH}/worker.Dockerfile \
                                 -t youtube-tunnel-worker:${IMAGE_TAG} \
-                                ./backend/worker
+                                ./backend
                         '''
                     }
                 }
