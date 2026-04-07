@@ -10,12 +10,11 @@ use std::path::PathBuf;
 use std::process::Stdio;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 use tokio::fs;
 use tokio::process::Command;
 use tokio::sync::Mutex;
-use notify::{Watcher, RecursiveMode, EventKind, event::ModifyKind};
-use tokio::sync::mpsc;
+use tokio::time::sleep;
 use tracing::{error, info};
 
 pub struct JobConsumer {
@@ -148,17 +147,6 @@ impl JobConsumer {
 
         info!("Got cookie: {}", &cookie_path.to_string_lossy());
 
-        let (tx, mut rx) = mpsc::channel::<notify::Event>(100);
-        let tx_clone = tx.clone();
-        
-        let mut watcher = notify::recommended_watcher(move |res: notify::Result<notify::Event>| {
-            if let Ok(event) = res {
-                let _ = tx_clone.blocking_send(event);
-            }
-        })?;
-
-        watcher.watch(&work_dir, RecursiveMode::NonRecursive)?;
-
         // yt-dlp -> ffmpeg pipeline
         let mut yt_process = Command::new("yt-dlp")
             .args([
@@ -206,7 +194,7 @@ impl JobConsumer {
                 "-hls_list_size",
                 "0",
                 "-hls_flags",
-                "independent_segments+append_list+temp_file",
+                "independent_segments+append_list",
                 "-start_number",
                 "0",
                 "-f",
@@ -227,84 +215,121 @@ impl JobConsumer {
         }
 
         let uploaded_files = Arc::new(Mutex::new(HashSet::new()));
-        let mut segments_count = 0u64;
-        let mut yt_done = false;
-        let mut ff_done = false;
-        let mut last_playlist_upload = tokio::time::Instant::now();
-        let bucket_name_str = bucket_name.to_string();
+        let minio_clone = self.minio.clone();
+        let uploaded_clone = uploaded_files.clone();
+        let uploader_job_id = job_id.clone();
+        let work_dir_clone = work_dir.clone();
+        let redis_pool_clone = self.redis_pool.clone();
 
-        loop {
-            tokio::select! {
-                _ = yt_process.wait(), if !yt_done => {
-                    yt_done = true;
-                }
-                _ = ff_process.wait(), if !ff_done => {
-                    ff_done = true;
-                    // Stop watching directory events
-                    break;
-                }
-                Some(event) = rx.recv() => {
-                    match event.kind {
-                        EventKind::Create(_) | EventKind::Modify(_) => {
-                            for path in event.paths {
-                                let filename = path.file_name().unwrap_or_default().to_string_lossy().to_string();
-                                
-                                if filename.ends_with(".ts") {
-                                    let mut uploaded = uploaded_files.lock().await;
-                                    if uploaded.contains(&filename) {
-                                        continue;
-                                    }
-                                    
-                                    if let Ok(meta) = fs::metadata(&path).await {
-                                        if meta.len() > 0 {
-                                            uploaded.insert(filename.clone());
-                                            segments_count += 1;
-                                            
-                                            let m_clone = self.minio.clone();
-                                            let b_clone = bucket_name_str.clone();
-                                            let j_clone = job_id.to_string();
-                                            let p_clone = path.clone();
-                                            let r_clone = self.redis_pool.clone();
-                                            
-                                            tokio::spawn(async move {
-                                                if let Err(e) = upload_file(&m_clone, &b_clone, &j_clone, &p_clone).await {
-                                                    error!("Failed to upload {}: {}", filename, e);
-                                                } else {
-                                                    info!("Uploaded segment {} (total: {})", filename, segments_count);
-                                                    let progress = (segments_count as f64 * 0.05).min(0.95);
-                                                    let _ = set_job_progress_internal(&r_clone, &j_clone, progress).await;
-                                                    let _ = fs::remove_file(&p_clone).await;
-                                                }
-                                            });
+        tokio::spawn(async move {
+            let mut last_playlist_upload: Option<SystemTime> = None;
+            let mut segments_count = 0u64;
+
+            loop {
+                match fs::read_dir(&work_dir_clone).await {
+                    Ok(mut dir) => {
+                        let mut playlist_needs_upload = false;
+
+                        while let Ok(Some(entry)) = dir.next_entry().await {
+                            let file = entry.path();
+                            let filename = file.file_name().unwrap().to_string_lossy().to_string();
+
+                            // Upload segments (.ts)
+                            if filename.ends_with(".ts") {
+                                let mut uploaded = uploaded_clone.lock().await;
+                                if uploaded.contains(&filename) {
+                                    continue;
+                                }
+
+                                // For first few segments, use shorter wait time for faster playback start
+                                let wait_time = if segments_count < 3 { 100 } else { 300 };
+                                if !is_file_stable(&file, wait_time).await {
+                                    continue;
+                                }
+
+                                let mut attempts = 0;
+                                let uploaded_ok = loop {
+                                    attempts += 1;
+                                    match upload_file(
+                                        &minio_clone,
+                                        bucket_name,
+                                        &uploader_job_id,
+                                        &file,
+                                    )
+                                    .await
+                                    {
+                                        Ok(_) => break true,
+                                        Err(e) => {
+                                            error!(
+                                                "Failed to upload {filename} (try {attempts}): {e}"
+                                            );
+                                            if attempts >= 3 {
+                                                break false;
+                                            }
+                                            sleep(Duration::from_secs(2)).await;
                                         }
                                     }
-                                } else if filename.ends_with(".m3u8") {
-                                    if last_playlist_upload.elapsed() > Duration::from_secs(5) && segments_count > 0 {
-                                        last_playlist_upload = tokio::time::Instant::now();
-                                        
-                                        let m_clone = self.minio.clone();
-                                        let b_clone = bucket_name_str.clone();
-                                        let j_clone = job_id.to_string();
-                                        let p_clone = path.clone();
-                                        
-                                        tokio::spawn(async move {
-                                            if let Err(e) = upload_file(&m_clone, &b_clone, &j_clone, &p_clone).await {
-                                                error!("Failed to upload playlist: {}", e);
-                                            } else {
-                                                info!("Uploaded updated playlist {} ({} segments ready)", filename, segments_count);
-                                            }
-                                        });
+                                };
+
+                                if uploaded_ok {
+                                    uploaded.insert(filename.clone());
+                                    segments_count += 1;
+                                    info!("Uploaded segment {filename} (total: {})", segments_count);
+                                    
+                                    // Update progress (estimate: each segment ~0.05-0.1 of video, cap at 0.95 until completion)
+                                    let progress = (segments_count as f64 * 0.05).min(0.95);
+                                    let _ = set_job_progress_internal(&redis_pool_clone, &uploader_job_id, progress).await;
+                                    
+                                    playlist_needs_upload = true;
+                                    let _ = fs::remove_file(&file).await;
+                                }
+                            }
+                            // Upload playlist (.m3u8) - upload more frequently for better streaming
+                            else if filename.ends_with(".m3u8") {
+                                if let Ok(metadata) = fs::metadata(&file).await {
+                                    let modified = metadata.modified().unwrap_or(SystemTime::now());
+                                    
+                                    // Upload playlist if:
+                                    // 1. We have at least one segment uploaded, OR
+                                    // 2. It's been 5 seconds since last upload, OR
+                                    // 3. All segments are uploaded
+                                    let should_upload = segments_count > 0 && (
+                                        last_playlist_upload.map_or(true, |prev| {
+                                            modified.duration_since(prev).unwrap_or(Duration::ZERO) > Duration::from_secs(5)
+                                        }) || playlist_needs_upload
+                                    );
+
+                                    if should_upload {
+                                        last_playlist_upload = Some(modified);
+                                        if let Err(e) = upload_file(
+                                            &minio_clone,
+                                            bucket_name,
+                                            &uploader_job_id,
+                                            &file,
+                                        )
+                                        .await
+                                        {
+                                            error!("Failed to upload playlist: {e}");
+                                        } else {
+                                            info!("Uploaded updated playlist {filename} ({} segments ready)", segments_count);
+                                        }
                                     }
                                 }
                             }
                         }
-                        _ => {}
+                    }
+                    Err(e) => {
+                        error!("Upload scanner failed: {e}");
+                        break;
                     }
                 }
-            }
-        }
 
-        drop(watcher);
+                sleep(Duration::from_secs(1)).await; // Check more frequently
+            }
+        });
+
+        let _ = yt_process.wait().await;
+        let _ = ff_process.wait().await;
 
         if let Ok(mut dir) = fs::read_dir(&work_dir).await {
             while let Ok(Some(entry)) = dir.next_entry().await {
@@ -325,11 +350,11 @@ impl JobConsumer {
 
         if fs::try_exists(&playlist_path).await? {
             upload_file(&self.minio, bucket_name, job_id, &playlist_path).await?;
-            info!("Final playlist uploaded for job {}", job_id);
+            info!(" Final playlist uploaded for job {}", job_id);
         }
 
-        fs::remove_dir_all(&work_dir).await?;
-        info!("Job {} finished successfully!", job_id);
+        fs::remove_dir_all(&work_dir.clone()).await?;
+        info!(" Job {} finished successfully!", job_id);
         Ok(())
     }
 }
@@ -361,5 +386,14 @@ async fn set_job_progress_internal(redis_pool: &Pool, job_id: &str, progress: f6
     Ok(())
 }
 
-
+async fn is_file_stable(path: &PathBuf, wait_ms: u64) -> bool {
+    if let Ok(meta1) = fs::metadata(path).await {
+        let size1 = meta1.len();
+        tokio::time::sleep(Duration::from_millis(wait_ms)).await;
+        if let Ok(meta2) = fs::metadata(path).await {
+            return size1 == meta2.len();
+        }
+    }
+    false
+}
 
