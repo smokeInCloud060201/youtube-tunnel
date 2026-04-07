@@ -1,0 +1,52 @@
+{
+  "repository_type": "multi-part",
+  "parts": [
+    {
+      "part_id": "api",
+      "display_name": "API Service",
+      "root_path": "backend/api",
+      "project_type_id": "backend",
+      "primary_language": "Rust",
+      "primary_framework": "Actix-web 4",
+      "entry_point": "backend/api/src/main.rs"
+    },
+    {
+      "part_id": "worker",
+      "display_name": "Worker Service",
+      "root_path": "backend/worker",
+      "project_type_id": "backend",
+      "primary_language": "Rust",
+      "primary_framework": "Tokio async runtime",
+      "entry_point": "backend/worker/src/main.rs"
+    },
+    {
+      "part_id": "web",
+      "display_name": "Web Frontend",
+      "root_path": "web",
+      "project_type_id": "web",
+      "primary_language": "TypeScript",
+      "primary_framework": "React 18 / Vite 7",
+      "entry_point": "web/src/main.tsx"
+    }
+  ],
+  "integration_points": [
+    {
+      "from": "web",
+      "to": "api",
+      "type": "REST (HTTP/HTTPS)",
+      "details": "Frontend calls API using Axios. Base URL configured via VITE_API_BASE_URL env var. Endpoints under /v1/."
+    },
+    {
+      "from": "api",
+      "to": "worker",
+      "type": "Redis Queue (RPUSH/BRPOP)",
+      "details": "API pushes VideoJob JSON payloads to 'job-queue' Redis list. Worker consumes via blocking pop (BRPOP)."
+    },
+    {
+      "from": "worker",
+      "to": "api",
+      "type": "Shared Redis + MinIO",
+      "details": "Worker writes job status (job:{id}:status) and progress (job:{id}:progress) to Redis with 1h TTL. API reads these for status queries. Both services share MinIO bucket 'yt-videos'."
+    }
+  ]
+}

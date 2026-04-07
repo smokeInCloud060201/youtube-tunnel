@@ -1,0 +1,102 @@
+{
+  "workflow_version": "1.2.0",
+  "timestamps": {
+    "started": "2026-04-07T08:56:47+07:00",
+    "last_updated": "2026-04-07T08:56:47+07:00"
+  },
+  "mode": "initial_scan",
+  "scan_level": "deep",
+  "project_root": "/Users/karson.tang/workspace/personal/youtube-tunnel",
+  "project_knowledge": "/Users/karson.tang/workspace/personal/youtube-tunnel/docs",
+  "completed_steps": [
+    {
+      "step": "step_1",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "Classified as multi-part with 3 parts: api (backend), worker (backend), web (frontend)"
+    },
+    {
+      "step": "step_2",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "Found 1 existing doc (web/README.md – Vite template stub). No meaningful project-level README."
+    },
+    {
+      "step": "step_3",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "Tech stack: Rust 2024/Actix-web 4 (api, worker), React 18/Vite 7/TypeScript (web)"
+    },
+    {
+      "step": "step_4",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "API scan complete (8 endpoints), data models extracted, component inventory extracted"
+    },
+    {
+      "step": "step_5",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "Source tree documented"
+    },
+    {
+      "step": "step_6",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "Dev and deployment guides written"
+    },
+    {
+      "step": "step_7",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "Integration architecture documented – 3 integration points"
+    },
+    {
+      "step": "step_8",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "Architecture docs written for 3 parts (api, worker, web)"
+    },
+    {
+      "step": "step_9",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "All supporting docs written"
+    },
+    {
+      "step": "step_10",
+      "status": "completed",
+      "timestamp": "2026-04-07T08:56:47+07:00",
+      "summary": "Master index generated"
+    }
+  ],
+  "current_step": "step_11",
+  "project_types": [
+    { "part_id": "api", "project_type_id": "backend", "display_name": "API Service (Rust/Actix-web)" },
+    { "part_id": "worker", "project_type_id": "backend", "display_name": "Worker Service (Rust/Tokio)" },
+    { "part_id": "web", "project_type_id": "web", "display_name": "Web Frontend (React/TypeScript/Vite)" }
+  ],
+  "findings": {
+    "project_classification": "multi-part: 3 services (api, worker, web)",
+    "technology_stack": {
+      "api": "Rust 2024, Actix-web 4, Redis (deadpool-redis), MinIO (aws-sdk-s3), tokio",
+      "worker": "Rust 2024, Actix-web 4, Redis, MinIO, yt-dlp, ffmpeg, tokio",
+      "web": "React 18, TypeScript, Vite 7, TailwindCSS 3, shadcn/ui (Radix), hls.js, axios"
+    }
+  },
+  "outputs_generated": [
+    "project-scan-report.json",
+    "project-overview.md",
+    "source-tree-analysis.md",
+    "architecture-api.md",
+    "architecture-worker.md",
+    "architecture-web.md",
+    "api-contracts-api.md",
+    "component-inventory-web.md",
+    "development-guide.md",
+    "deployment-guide.md",
+    "integration-architecture.md",
+    "project-parts.json",
+    "index.md"
+  ]
+}
