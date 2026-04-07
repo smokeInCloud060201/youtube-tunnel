@@ -24,7 +24,7 @@ WORKDIR /build
 RUN apk add --no-cache build-base yasm nasm wget tar \
     x264-dev x265-dev libvpx-dev fdk-aac-dev opus-dev freetype-dev libass-dev openssl-dev
 
-COPY ./tools/ffmpeg-$FFMPEG_VERSION.tar.gz /build/
+COPY ./worker/tools/ffmpeg-$FFMPEG_VERSION.tar.gz /build/
 RUN tar xzf ffmpeg-$FFMPEG_VERSION.tar.gz && \
     cd ffmpeg-$FFMPEG_VERSION && \
     ./configure \
