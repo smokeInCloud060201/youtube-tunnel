@@ -10,11 +10,11 @@ IMAGE_TAG=latest
 
 build-api-image:
 	$(DOCKER_BIN) rmi -f youtube-tunnel-api:${IMAGE_TAG} || true
-	DOCKER_BUILDKIT=1 $(DOCKER_BIN) build -f $(DOCKER_BASE_PATH)/api.Dockerfile -t youtube-tunnel-api:${IMAGE_TAG} ./backend/api
+	DOCKER_BUILDKIT=1 $(DOCKER_BIN) build -f $(DOCKER_BASE_PATH)/api.Dockerfile -t youtube-tunnel-api:${IMAGE_TAG} ./backend
 
 build-worker-image:
 	$(DOCKER_BIN) rmi -f youtube-tunnel-worker:${IMAGE_TAG} || true
-	DOCKER_BUILDKIT=1 $(DOCKER_BIN) build -f $(DOCKER_BASE_PATH)/worker.Dockerfile -t youtube-tunnel-worker:${IMAGE_TAG} ./backend/worker
+	DOCKER_BUILDKIT=1 $(DOCKER_BIN) build -f $(DOCKER_BASE_PATH)/worker.Dockerfile -t youtube-tunnel-worker:${IMAGE_TAG} ./backend
 
 build-web-image:
 	$(DOCKER_BIN) rmi -f youtube-tunnel-web:${IMAGE_TAG} || true

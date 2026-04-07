@@ -1,4 +1,4 @@
-ARG RUST_VERSION=1.90.0
+ARG RUST_VERSION=1.91.1
 ARG APP_NAME=youtube-tunnel-worker
 ARG FFMPEG_VERSION=6.1
 ARG YT_DLP_VERSION=2025.09.26
@@ -11,6 +11,7 @@ RUN apk add --no-cache clang lld musl-dev git pkgconfig openssl-dev openssl-libs
 ENV OPENSSL_STATIC=1
 
 COPY Cargo.toml Cargo.lock ./
+COPY api api
 COPY worker worker
 COPY shared shared
 

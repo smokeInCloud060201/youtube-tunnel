@@ -1,4 +1,4 @@
-ARG RUST_VERSION=1.90.0
+ARG RUST_VERSION=1.91.1
 ARG APP_NAME=youtube-tunnel-api
 
 
@@ -12,6 +12,7 @@ ENV OPENSSL_STATIC=1
 
 COPY Cargo.toml Cargo.lock ./
 COPY api api
+COPY worker worker
 COPY shared shared
 
 RUN cargo build -p youtube-tunnel-api --locked --release && \
