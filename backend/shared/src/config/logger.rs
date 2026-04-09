@@ -4,7 +4,7 @@ pub fn init() {
     unsafe {
         env::set_var(
             "RUST_LOG",
-            "youtube_tunnel_api=info,youtube_tunnel_api=debug,actix_web=info,actix_web=debug,actix_server=info",
+            "youtube_tunnel_worker=debug,youtube_tunnel_api=info,youtube_tunnel_api=debug,actix_web=info,actix_web=debug,actix_server=info",
         );
         env::set_var(
             "RUST_BACKTRACE",
