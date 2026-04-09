@@ -55,12 +55,24 @@ impl JobConsumer {
     }
 
     async fn run_loop(&self) -> anyhow::Result<()> {
-        let mut conn = self.redis_pool.get().await?;
         while self.running.load(Ordering::SeqCst) {
-            let result: Option<(String, String)> = conn
-                .brpop("job-queue", 0f64)
-                .await
-                .map_err(|e| anyhow!("Redis pop failed: {e}"))?;
+            let mut conn = match self.redis_pool.get().await {
+                Ok(c) => c,
+                Err(e) => {
+                    tracing::error!("Worker failed to get redis connection: {}", e);
+                    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                    continue;
+                }
+            };
+            
+            let result: Option<(String, String)> = match conn.brpop("job-queue", 5.0).await {
+                Ok(res) => res,
+                Err(e) => {
+                    tracing::error!("Redis pop error, retrying: {}", e);
+                    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                    continue;
+                }
+            };
 
             if let Some((_queue, payload)) = result {
                 match serde_json::from_str::<VideoJob>(&payload) {

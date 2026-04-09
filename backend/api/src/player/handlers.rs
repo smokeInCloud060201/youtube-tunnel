@@ -49,15 +49,17 @@ async fn get_video_playlist(
 ) -> actix_web::Result<HttpResponse> {
     info!("Got a /v1/video-playlist request {job_id}");
 
-    let response = service
-        .as_ref()
-        .get_playlist(job_id.to_string())
-        .await
-        .expect("Failed to get playlist");
-
-    Ok(HttpResponse::Ok()
-        .content_type("application/json")
-        .body(response))
+    match service.as_ref().get_playlist(job_id.to_string()).await {
+        Ok(response) => {
+            Ok(HttpResponse::Ok()
+                .content_type("application/json")
+                .body(response))
+        }
+        Err(e) => {
+            tracing::warn!("Playlist not found for job_id={} ({})", job_id, e);
+            Ok(HttpResponse::NotFound().body("Playlist not ready yet"))
+        }
+    }
 }
 
 #[get("/v1/video-player/{job_id}/status")]
